@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Totools - Kumpulan Web Tools Praktis</title>
+    <meta name="description" content="Kumpulan tools online gratis untuk developer dan penulis. Convert teks, format kode, hitung kata, dan banyak lagi.">
+    <style>
+        /* --- 1. RESET & BASIC STYLE (Agar tampilan konsisten) --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* --- 2. HEADER & HERO SECTION --- */
+        header {
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 1rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #2c3e50;
+        }
+        .logo span { color: #3498db; } /* Aksen biru biar terpercaya */
+
+        .hero {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 4rem 1rem;
+            text-align: center;
+        }
+
+        .hero h1 { margin-bottom: 1rem; font-size: 2.5rem; }
+        .hero p { margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.9; }
+
+        /* Search Bar Sederhana */
+        .search-box {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            outline: none;
+        }
+
+        /* --- 3. TOOLS GRID (Etalase Toko) --- */
+        .container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            border-left: 5px solid #3498db;
+            padding-left: 10px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e1e1e1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            border-color: #3498db;
+        }
+
+        .tool-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #3498db;
+        }
+
+        .tool-title { font-weight: 700; margin-bottom: 0.5rem; }
+        .tool-desc { font-size: 0.9rem; color: #666; margin-bottom: 1rem; }
+        
+        .btn-tool {
+            display: inline-block;
+            background-color: #f0f4f8;
+            color: #3498db;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .btn-tool:hover { background-color: #3498db; color: white; }
+
+        /* --- 4. FOOTER --- */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">To<span>Tools</span>.</div>
+        <nav>
+            </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Bantu Kerjaan Tuan Lebih Cepat</h1>
+        <p>Kumpulan tools gratis untuk developer, penulis, dan marketing.</p>
+        <div class="search-box">
+            <input type="text" placeholder="Cari tools (misal: text to html)..." id="searchInput">
+        </div>
+    </section>
+
+    <div class="container">
+        
+        <h2 class="section-title">Developer Tools</h2>
+        <div class="tools-grid">
+            <a href="/text-to-html" class="tool-card">
+                <div class="tool-icon">code</div>
+                <div>
+                    <h3 class="tool-title">Text to HTML</h3>
+                    <p class="tool-desc">Ubah teks biasa menjadi format paragraf HTML dengan cepat.</p>
+                </div>
+                <span class="btn-tool">Gunakan &rarr;</span>
+            </a>
+
+            <a href="/json-formatter" class="tool-card">
+                <div class="tool-icon">data_object</div>
+                <div>
+                    <h3 class="tool-title">JSON Formatter</h3>
+                    <p class="tool-desc">Rapikan kode JSON yang berantakan agar mudah dibaca.</p>
+                </div>
+                <span class="btn-tool">Gunakan &rarr;</span>
+            </a>
+
+            <a href="/css-minifier" class="tool-card">
+                <div class="tool-icon">css</div>
+                <div>
+                    <h3 class="tool-title">CSS Minifier</h3>
+                    <p class="tool-desc">Kompres ukuran file CSS agar website lebih cepat.</p>
+                </div>
+                <span class="btn-tool">Gunakan &rarr;</span>
+            </a>
+        </div>
+
+        <br><br>
+
+        <h2 class="section-title">Writer & Productivity</h2>
+        <div class="tools-grid">
+            <a href="/word-counter" class="tool-card">
+                <div class="tool-icon">segment</div>
+                <div>
+                    <h3 class="tool-title">Word Counter</h3>
+                    <p class="tool-desc">Hitung jumlah kata dan karakter secara real-time.</p>
+                </div>
+                <span class="btn-tool">Gunakan &rarr;</span>
+            </a>
+
+            <a href="/lorem-ipsum" class="tool-card">
+                <div class="tool-icon">article</div>
+                <div>
+                    <h3 class="tool-title">Lorem Ipsum Generator</h3>
+                    <p class="tool-desc">Buat teks dummy (contoh) untuk layout desain Tuan.</p>
+                </div>
+                <span class="btn-tool">Gunakan &rarr;</span>
+            </a>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Totools. Dibuat untuk produktivitas.</p>
+    </footer>
+
+</body>
+</html>
