@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Tools Tuan Cecep</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>🛠️ Tools Tuan Cecep</h1>
+        <p>Pilih alat yang Tuan butuhkan!</p>
+    </header>
+
+    <main>
+        <div class="menu-grid">
+            <button class="card-btn" onclick="bukaAlat('konversi')">
+                <span class="ikon-besar">💵</span>
+                <span class="teks-tombol">Konversi USD-IDR</span>
+            </button>
+
+            <button class="card-btn" onclick="bukaAlat('translate')">
+                <span class="ikon-besar">🌐</span>
+                <span class="teks-tombol">Penerjemah</span>
+            </button>
+            
+            <a href="barcode.html" class="card-btn btn-berat">
+                <span class="ikon-besar">🔳</span>
+                <span class="teks-tombol">Buat Barcode</span>
+            </a>
+        </div>
+
+        <div id="layar-gelap" class="overlay" onclick="tutupModal()"></div>
+
+        <div id="konversi" class="ruang-alat">
+            <button class="tombol-close" onclick="tutupModal()">✖</button>
+            
+            <h2>💵 Konversi Real-Time</h2>
+            <p class="deskripsi-alat">Ketik angkanya, hasil langsung muncul!</p>
+
+            <div class="grup-input">
+                <label>Dari Mata Uang:</label>
+                <select id="mata-uang-asal" onchange="ambilDataKurs()">
+                    <option value="USD">USD - Dolar Amerika</option>
+                    <option value="IDR">IDR - Rupiah Indonesia</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="JPY">JPY - Yen Jepang</option>
+                    <option value="MYR">MYR - Ringgit Malaysia</option>
+                </select>
+                <input type="number" id="jumlah-awal" placeholder="Masukkan jumlah..." value="1" oninput="hitungRealTime()" min="0">
+            </div>
+
+            <div class="grup-input">
+                <label>Ke Mata Uang:</label>
+                <select id="mata-uang-tujuan" onchange="hitungRealTime()">
+                    <option value="IDR" selected>IDR - Rupiah Indonesia</option>
+                    <option value="USD">USD - Dolar Amerika</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="JPY">JPY - Yen Jepang</option>
+                    <option value="MYR">MYR - Ringgit Malaysia</option>
+                </select>
+            </div>
+
+            <div id="hasil-konversi" class="area-hasil">
+                Hasil: -
+            </div>
+        </div>
+
+        <div id="translate" class="ruang-alat">
+            <button class="tombol-close" onclick="tutupModal()">✖</button>
+            
+            <h2>🌐 Penerjemah Teks</h2>
+            <p class="deskripsi-alat">Paste teksnya, lalu tekan Terjemahkan!</p>
+
+            <div class="grup-input">
+                <select id="bahasa-asal">
+                    <option value="id">🇮🇩 Indonesia</option>
+                    <option value="en">🇬🇧 Inggris</option>
+                    <option value="ja">🇯🇵 Jepang</option>
+                    <option value="ar">🇸🇦 Arab</option>
+                </select>
+                <textarea id="teks-input" placeholder="Paste/ketik kalimat di sini..." rows="3"></textarea>
+            </div>
+
+            <button class="btn-aksi" onclick="jalankanTranslateManual()">🚀 Terjemahkan!</button>
+
+            <div class="grup-input" style="margin-top: 15px;">
+                <select id="bahasa-tujuan">
+                    <option value="en" selected>🇬🇧 Inggris</option>
+                    <option value="id">🇮🇩 Indonesia</option>
+                    <option value="ja">🇯🇵 Jepang</option>
+                    <option value="ar">🇸🇦 Arab</option>
+                </select>
+                <textarea id="teks-hasil" placeholder="Hasil terjemahan..." rows="3" readonly></textarea>
+            </div>
+
+            <button class="btn-aksi btn-salin" onclick="salinTeks()">📋 Salin Hasil</button>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
