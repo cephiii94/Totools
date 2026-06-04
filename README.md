@@ -12,7 +12,10 @@ Totools/
 │   ├── css/
 │   │   └── style.css
 │   └── js/
-│       └── script.js
+│       ├── main.js
+│       ├── core/
+│       ├── data/
+│       └── tools/
 └── README.md
 ```
 
@@ -22,10 +25,17 @@ Totools/
 - Penerjemah teks
 - Barcode generator
 - QR Code generator
+- Word Counter
 
 ## Cara pakai
 
-Buka `index.html` langsung di browser, atau upload folder ini ke hosting statis seperti GitHub Pages, Netlify, atau Vercel static hosting.
+Upload folder ini ke hosting statis seperti GitHub Pages, Netlify, atau Vercel static hosting.
+
+Karena JavaScript memakai ES modules, jalankan melalui server lokal saat development. Contoh:
+
+```bash
+python -m http.server 4173
+```
 
 ## Catatan dependency
 

@@ -179,13 +179,13 @@ p {
 .shortcut-area {
     position: relative;
     z-index: 2;
-    display: grid;
-    width: 280px;
-    grid-template-columns: repeat(2, 96px);
-    gap: 22px 18px;
+    width: calc(100vw - 64px);
+    height: calc(100vh - 206px);
+    margin-bottom: 70px;
 }
 
 .tool-card {
+    position: absolute;
     display: grid;
     justify-items: center;
     gap: 8px;
@@ -199,6 +199,8 @@ p {
     cursor: pointer;
     text-shadow: 0 1px 8px rgba(15, 23, 42, 0.35);
     transition: background 0.16s ease, transform 0.16s ease, border-color 0.16s ease;
+    user-select: none;
+    touch-action: none;
 }
 
 .tool-card:hover {
@@ -210,6 +212,15 @@ p {
 .tool-card.is-selected {
     background: rgba(255, 255, 255, 0.24);
     border-color: rgba(255, 255, 255, 0.34);
+}
+
+.tool-card.is-dragging {
+    opacity: 0.55;
+    transform: scale(1.04);
+}
+
+.tool-card.is-positioned {
+    transition: background 0.16s ease, border-color 0.16s ease, opacity 0.16s ease;
 }
 
 .tool-card:active {
@@ -253,6 +264,14 @@ p {
 
 .qr {
     background: linear-gradient(145deg, #7c3aed, #c084fc);
+}
+
+.settings {
+    background: linear-gradient(145deg, #f97316, #facc15);
+}
+
+.word {
+    background: linear-gradient(145deg, #0891b2, #67e8f9);
 }
 
 .tool-title {
@@ -302,6 +321,8 @@ p {
 }
 
 .start-button {
+    border: 0;
+    background: transparent;
     display: inline-flex;
     width: max-content;
     align-items: center;
@@ -311,6 +332,7 @@ p {
     border-radius: 10px;
     font-size: 14px;
     font-weight: 800;
+    cursor: pointer;
 }
 
 .start-button:hover,
@@ -378,6 +400,81 @@ p {
     color: #334155;
     font-size: 13px;
     font-weight: 700;
+}
+
+.start-menu {
+    position: fixed;
+    left: 16px;
+    bottom: 84px;
+    z-index: 75;
+    display: none;
+    width: min(380px, calc(100% - 32px));
+    padding: 14px;
+    background: rgba(248, 250, 252, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 16px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.34);
+    backdrop-filter: blur(24px);
+}
+
+.start-menu.aktif {
+    display: block;
+}
+
+.start-menu-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 8px 14px;
+}
+
+.start-menu-head strong {
+    display: block;
+    color: #0f172a;
+    font-size: 16px;
+}
+
+.start-menu-head p {
+    margin: 2px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.start-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.start-menu-grid button {
+    display: grid;
+    min-height: 84px;
+    justify-items: center;
+    gap: 7px;
+    padding: 10px 6px;
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(226, 232, 240, 0.86);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.start-menu-grid button:hover {
+    background: #ffffff;
+}
+
+.start-menu-grid .tool-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+}
+
+.start-menu-grid .tool-icon svg {
+    width: 24px;
+    height: 24px;
 }
 
 .toast {
@@ -623,7 +720,9 @@ p {
 }
 
 .barcode-modal,
-.qr-modal {
+.qr-modal,
+.settings-modal,
+.word-modal {
     width: min(560px, calc(100% - 40px));
 }
 
@@ -753,6 +852,130 @@ p {
     font-weight: 800;
 }
 
+.settings-list {
+    display: grid;
+    gap: 10px;
+    margin: 18px 0;
+}
+
+.settings-section {
+    margin: 18px 0;
+}
+
+.settings-section h3 {
+    margin: 0 0 6px;
+    color: #0f172a;
+    font-size: 17px;
+}
+
+.settings-section > p {
+    margin: 0 0 12px;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.dock-settings-list {
+    display: grid;
+    gap: 10px;
+}
+
+.dock-setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(248, 250, 252, 0.9);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 12px;
+}
+
+.dock-setting-item span {
+    color: #334155;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.dock-setting-item input {
+    width: 20px;
+    height: 20px;
+    accent-color: #2563eb;
+    cursor: pointer;
+}
+
+.settings-action {
+    margin-top: 12px;
+}
+
+.settings-list div,
+.version-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(248, 250, 252, 0.9);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 12px;
+}
+
+.settings-list span {
+    display: grid;
+    min-width: 38px;
+    height: 30px;
+    place-items: center;
+    color: #0f172a;
+    background: #e2e8f0;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.settings-list p,
+.version-card span {
+    margin: 0;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.version-card strong {
+    color: #0f172a;
+    font-size: 14px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.stats-grid div {
+    min-height: 84px;
+    padding: 14px 10px;
+    text-align: center;
+    background: rgba(248, 250, 252, 0.92);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 12px;
+}
+
+.stats-grid span {
+    display: block;
+    color: #0f172a;
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.stats-grid p {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+}
+
 @media (max-width: 720px) {
     body {
         background: #111827;
@@ -829,6 +1052,7 @@ p {
     .shortcut-area {
         display: grid;
         width: 100%;
+        height: auto;
         grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 24px 12px;
         justify-items: center;
@@ -836,6 +1060,7 @@ p {
     }
 
     .tool-card {
+        position: static;
         width: 100%;
         max-width: 96px;
         min-height: 112px;
@@ -843,6 +1068,7 @@ p {
         color: #ffffff;
         border: 0;
         border-radius: 18px;
+        touch-action: manipulation;
     }
 
     .tool-card:hover {
@@ -910,6 +1136,7 @@ p {
     }
 
     .start-button,
+    .start-menu,
     .taskbar-clock {
         display: none;
     }
@@ -958,6 +1185,8 @@ p {
     .translate-modal,
     .barcode-modal,
     .qr-modal,
+    .settings-modal,
+    .word-modal,
     .small-modal {
         top: 0;
         right: 0;
@@ -1028,5 +1257,9 @@ p {
     .secondary-button,
     .result-box {
         border-radius: 14px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
