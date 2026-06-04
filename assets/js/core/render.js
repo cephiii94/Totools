@@ -11,7 +11,7 @@ export function renderTools(dockTools) {
     const areaDesktopSettings = document.querySelector('[data-render="desktop-settings"]');
     const areaStartMenu = document.querySelector('[data-render="start-menu"]');
     const daftarTools = getDaftarTools();
-    const desktopTools = bacaDesktopTools();
+    const desktopTools = bacaDesktopTools(daftarTools);
 
     if (areaTools) {
         areaTools.innerHTML = daftarTools.filter((tool) => desktopTools.includes(tool.id)).map((tool) => `
@@ -61,7 +61,7 @@ export function renderTools(dockTools) {
     }
 }
 
-function bacaDesktopTools() {
+function bacaDesktopTools(daftarTools) {
     try {
         const semuaTool = daftarTools.map((tool) => tool.id);
         const tersimpan = JSON.parse(localStorage.getItem('totools-desktop-tools') || JSON.stringify(semuaTool));
