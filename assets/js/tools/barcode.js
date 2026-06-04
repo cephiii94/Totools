@@ -10,6 +10,16 @@ export function initBarcode() {
     buatBarcode();
 }
 
+function aturStatusBarcode(teks = '') {
+    const status = document.getElementById('barcode-status');
+    if (!status) {
+        return;
+    }
+
+    status.textContent = teks;
+    status.hidden = !teks;
+}
+
 function buatBarcode(tampilkanPesan = false) {
     const nilai = document.getElementById('barcode-value')?.value.trim();
     const format = document.getElementById('barcode-format')?.value;
@@ -21,6 +31,7 @@ function buatBarcode(tampilkanPesan = false) {
 
     if (!window.JsBarcode) {
         output.innerHTML = '';
+        aturStatusBarcode('Library barcode belum termuat. Simpan JsBarcode lokal di assets/vendor/jsbarcode.all.min.js atau coba saat internet aktif.');
         if (tampilkanPesan) {
             tampilkanToast('Library barcode belum termuat.');
         }
@@ -29,6 +40,7 @@ function buatBarcode(tampilkanPesan = false) {
 
     if (!nilai) {
         output.innerHTML = '';
+        aturStatusBarcode('');
         if (tampilkanPesan) {
             tampilkanToast('Isi barcode dulu.');
         }
@@ -36,6 +48,7 @@ function buatBarcode(tampilkanPesan = false) {
     }
 
     try {
+        aturStatusBarcode('');
         window.JsBarcode(output, nilai, {
             format,
             lineColor: '#0f172a',
@@ -48,6 +61,7 @@ function buatBarcode(tampilkanPesan = false) {
         });
     } catch (error) {
         output.innerHTML = '';
+        aturStatusBarcode('Format barcode tidak cocok dengan isi yang dimasukkan.');
         if (tampilkanPesan) {
             tampilkanToast('Format barcode tidak cocok dengan isi.');
         }

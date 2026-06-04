@@ -222,6 +222,7 @@
 
                 <div class="barcode-preview" aria-label="Preview barcode">
                     <svg id="barcode-output"></svg>
+                    <p id="barcode-status" class="library-status" role="status" aria-live="polite" hidden></p>
                 </div>
 
                 <button class="primary-button" type="button" data-action="generate-barcode">Buat Barcode</button>
@@ -268,6 +269,7 @@
                     <div class="qr-preview" aria-label="Preview QR Code">
                         <div id="qr-output"></div>
                         <p id="qr-caption" class="qr-caption"></p>
+                        <p id="qr-status" class="library-status" role="status" aria-live="polite" hidden></p>
                     </div>
 
                     <button class="primary-button" type="button" data-action="generate-qr">Buat QR Code</button>
@@ -290,6 +292,7 @@ Halo Tuan Cecep</textarea>
 
                     <div class="qr-preview batch-preview" aria-label="Preview batch QR Code">
                         <div id="qr-batch-output"></div>
+                        <p id="qr-batch-status" class="library-status" role="status" aria-live="polite" hidden></p>
                     </div>
 
                     <button class="primary-button" type="button" data-action="generate-qr">Buat Batch</button>
@@ -415,9 +418,9 @@ Halo Tuan Cecep</textarea>
         </section>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="assets/vendor/jsbarcode.all.min.js" data-fallback-src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc"></script>
+    <script src="assets/vendor/qrcode.min.js" data-fallback-src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc"></script>
+    <script src="assets/vendor/jszip.min.js" data-fallback-src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" onerror="this.onerror=null;this.src=this.dataset.fallbackSrc"></script>
     <script src="assets/js/fallback.js"></script>
     <script type="module" src="assets/js/main.js"></script>
 </body>

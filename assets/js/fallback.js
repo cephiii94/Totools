@@ -805,8 +805,18 @@
             return;
         }
 
+        function aturStatusBarcodeFallback(teks) {
+            var status = document.getElementById('barcode-status');
+            if (!status) {
+                return;
+            }
+            status.textContent = teks || '';
+            status.hidden = !teks;
+        }
+
         if (!window.JsBarcode) {
             output.innerHTML = '';
+            aturStatusBarcodeFallback('Library barcode belum termuat. Simpan JsBarcode lokal di assets/vendor/jsbarcode.all.min.js atau coba saat internet aktif.');
             if (tampilkanPesan) {
                 tampilkanToastFallback('Library barcode belum termuat.');
             }
@@ -815,6 +825,7 @@
 
         if (!nilai) {
             output.innerHTML = '';
+            aturStatusBarcodeFallback('');
             if (tampilkanPesan) {
                 tampilkanToastFallback('Isi barcode dulu.');
             }
@@ -822,6 +833,7 @@
         }
 
         try {
+            aturStatusBarcodeFallback('');
             window.JsBarcode(output, nilai, {
                 format: format,
                 lineColor: '#0f172a',
@@ -834,6 +846,7 @@
             });
         } catch (error) {
             output.innerHTML = '';
+            aturStatusBarcodeFallback('Format barcode tidak cocok dengan isi yang dimasukkan.');
             if (tampilkanPesan) {
                 tampilkanToastFallback('Format barcode tidak cocok dengan isi.');
             }
@@ -895,14 +908,26 @@
             return;
         }
 
+        function aturStatusQrFallback(targetId, teks) {
+            var status = document.getElementById(targetId);
+            if (!status) {
+                return;
+            }
+            status.textContent = teks || '';
+            status.hidden = !teks;
+        }
+
         output.innerHTML = '';
         outputBatch.innerHTML = '';
+        aturStatusQrFallback('qr-status', '');
+        aturStatusQrFallback('qr-batch-status', '');
         if (caption) {
             caption.textContent = '';
             caption.hidden = !includeText;
         }
 
         if (!window.QRCode) {
+            aturStatusQrFallback(qrModeFallback === 'batch' ? 'qr-batch-status' : 'qr-status', 'Library QR Code belum termuat. Simpan qrcode.min.js lokal di assets/vendor/ atau coba saat internet aktif.');
             if (tampilkanPesan) {
                 tampilkanToastFallback('Library QR Code belum termuat.');
             }
@@ -1015,11 +1040,21 @@
         }
 
         if (!window.JSZip) {
+            var statusZip = document.getElementById('qr-batch-status');
+            if (statusZip) {
+                statusZip.textContent = 'Library ZIP belum termuat. Simpan jszip.min.js lokal di assets/vendor/ untuk download batch offline.';
+                statusZip.hidden = false;
+            }
             tampilkanToastFallback('Library ZIP belum termuat.');
             return;
         }
 
         if (!window.QRCode) {
+            var statusQr = document.getElementById('qr-batch-status');
+            if (statusQr) {
+                statusQr.textContent = 'Library QR Code belum termuat. Simpan qrcode.min.js lokal di assets/vendor/ atau coba saat internet aktif.';
+                statusQr.hidden = false;
+            }
             tampilkanToastFallback('Library QR Code belum termuat.');
             return;
         }

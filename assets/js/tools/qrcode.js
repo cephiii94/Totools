@@ -46,6 +46,16 @@ function renderQr(target, teks, ukuran) {
     });
 }
 
+function aturStatusQr(targetId, teks = '') {
+    const status = document.getElementById(targetId);
+    if (!status) {
+        return;
+    }
+
+    status.textContent = teks;
+    status.hidden = !teks;
+}
+
 function buatQrCode(tampilkanPesan = false) {
     const nilai = document.getElementById('qr-value')?.value.trim();
     const ukuran = Number(document.getElementById('qr-size')?.value || 220);
@@ -60,12 +70,16 @@ function buatQrCode(tampilkanPesan = false) {
 
     output.innerHTML = '';
     outputBatch.innerHTML = '';
+    aturStatusQr('qr-status');
+    aturStatusQr('qr-batch-status');
     if (caption) {
         caption.textContent = '';
         caption.hidden = !includeText;
     }
 
     if (!window.QRCode) {
+        const pesan = 'Library QR Code belum termuat. Simpan qrcode.min.js lokal di assets/vendor/ atau coba saat internet aktif.';
+        aturStatusQr(qrModeAktif === 'batch' ? 'qr-batch-status' : 'qr-status', pesan);
         if (tampilkanPesan) {
             tampilkanToast('Library QR Code belum termuat.');
         }
@@ -216,11 +230,13 @@ async function downloadQrBatch() {
     }
 
     if (!window.JSZip) {
+        aturStatusQr('qr-batch-status', 'Library ZIP belum termuat. Simpan jszip.min.js lokal di assets/vendor/ untuk download batch offline.');
         tampilkanToast('Library ZIP belum termuat.');
         return;
     }
 
     if (!window.QRCode) {
+        aturStatusQr('qr-batch-status', 'Library QR Code belum termuat. Simpan qrcode.min.js lokal di assets/vendor/ atau coba saat internet aktif.');
         tampilkanToast('Library QR Code belum termuat.');
         return;
     }

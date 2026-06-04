@@ -743,6 +743,16 @@ p {
     max-width: 100%;
 }
 
+.library-status {
+    max-width: 34ch;
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-align: center;
+}
+
 .qr-preview canvas,
 .qr-preview img {
     display: block;
