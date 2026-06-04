@@ -3,103 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Tools Tuan Cecep</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Totools adalah kumpulan tools ringan untuk konversi mata uang, penerjemah teks, dan kebutuhan produktivitas harian.">
+    <title>Totools - Desktop Tools</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+    <main class="desktop">
+        <div class="mobile-statusbar" aria-hidden="true">
+            <span id="jam-mobile">09.41</span>
+            <span class="status-icons">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </div>
 
-    <header>
-        <h1>🛠️ Tools Tuan Cecep</h1>
-        <p>Pilih alat yang Tuan butuhkan!</p>
-    </header>
+        <section class="desktop-info" aria-label="Catatan Totools">
+            <div class="desktop-note">
+                <span class="note-label">Totools</span>
+                <span>Tools ringan siap pakai.</span>
+            </div>
+        </section>
 
-    <main>
-        <div class="menu-grid">
-            <button class="card-btn" onclick="bukaAlat('konversi')">
-                <span class="ikon-besar">💵</span>
-                <span class="teks-tombol">Konversi USD-IDR</span>
-            </button>
+        <section id="tools" class="shortcut-area" data-render="tools" aria-label="Daftar tools"></section>
 
-            <button class="card-btn" onclick="bukaAlat('translate')">
-                <span class="ikon-besar">🌐</span>
-                <span class="teks-tombol">Penerjemah</span>
-            </button>
-            
-            <a href="barcode.html" class="card-btn btn-berat">
-                <span class="ikon-besar">🔳</span>
-                <span class="teks-tombol">Buat Barcode</span>
+        <section class="desktop-widget" aria-label="Catatan proyek">
+            <p class="eyebrow">Status</p>
+            <h2>Vanilla mode</h2>
+            <p>CSS dan JS sudah dipisah. Siap ditambah tool baru tanpa framework.</p>
+        </section>
+
+        <footer class="taskbar" aria-label="Taskbar">
+            <a href="index.html" class="start-button" aria-label="Totools home">
+                <span class="start-mark">T</span>
+                <span>Totools</span>
             </a>
-        </div>
-
-        <div id="layar-gelap" class="overlay" onclick="tutupModal()"></div>
-
-        <div id="konversi" class="ruang-alat">
-            <button class="tombol-close" onclick="tutupModal()">✖</button>
-            
-            <h2>💵 Konversi Real-Time</h2>
-            <p class="deskripsi-alat">Ketik angkanya, hasil langsung muncul!</p>
-
-            <div class="grup-input">
-                <label>Dari Mata Uang:</label>
-                <select id="mata-uang-asal" onchange="ambilDataKurs()">
-                    <option value="USD">USD - Dolar Amerika</option>
-                    <option value="IDR">IDR - Rupiah Indonesia</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="JPY">JPY - Yen Jepang</option>
-                    <option value="MYR">MYR - Ringgit Malaysia</option>
-                </select>
-                <input type="number" id="jumlah-awal" placeholder="Masukkan jumlah..." value="1" oninput="hitungRealTime()" min="0">
+            <div class="taskbar-apps" data-render="dock">
+                <button type="button" data-action="theme" aria-label="Ganti tema">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.4-6.4-1.4 1.4M7 17l-1.4 1.4m0-12.8L7 7m10 10 1.4 1.4M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
+                    </svg>
+                </button>
             </div>
+            <div class="taskbar-clock" id="jam-desktop">Totools</div>
+        </footer>
 
-            <div class="grup-input">
-                <label>Ke Mata Uang:</label>
-                <select id="mata-uang-tujuan" onchange="hitungRealTime()">
-                    <option value="IDR" selected>IDR - Rupiah Indonesia</option>
-                    <option value="USD">USD - Dolar Amerika</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="JPY">JPY - Yen Jepang</option>
-                    <option value="MYR">MYR - Ringgit Malaysia</option>
-                </select>
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <div id="layar-gelap" class="overlay" data-action="close-modal"></div>
+
+        <section id="konversi" class="tool-modal currency-modal" data-modal-title="Currency Converter" aria-label="Konversi mata uang">
+            <div class="modal-body">
+                <h2>Konversi Mata Uang</h2>
+                <p class="tool-helper">Masukkan jumlah, pilih mata uang, lalu hasil akan muncul otomatis.</p>
+
+                <div class="field-group">
+                    <label for="mata-uang-asal">Dari mata uang</label>
+                    <select id="mata-uang-asal" data-action="refresh-rate">
+                        <option value="USD">USD - Dolar Amerika</option>
+                        <option value="IDR">IDR - Rupiah Indonesia</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="JPY">JPY - Yen Jepang</option>
+                        <option value="MYR">MYR - Ringgit Malaysia</option>
+                    </select>
+                    <input type="number" id="jumlah-awal" placeholder="Masukkan jumlah" value="1" data-action="calculate-rate" min="0">
+                </div>
+
+                <div class="field-group">
+                    <label for="mata-uang-tujuan">Ke mata uang</label>
+                    <select id="mata-uang-tujuan" data-action="calculate-rate">
+                        <option value="IDR" selected>IDR - Rupiah Indonesia</option>
+                        <option value="USD">USD - Dolar Amerika</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="JPY">JPY - Yen Jepang</option>
+                        <option value="MYR">MYR - Ringgit Malaysia</option>
+                    </select>
+                </div>
+
+                <div id="hasil-konversi" class="result-box">Hasil: -</div>
             </div>
+        </section>
 
-            <div id="hasil-konversi" class="area-hasil">
-                Hasil: -
+        <section id="translate" class="tool-modal translate-modal" data-modal-title="Translator" aria-label="Penerjemah teks">
+            <div class="modal-body">
+                <h2>Penerjemah Teks</h2>
+                <p class="tool-helper">Paste teks, pilih bahasa, lalu tekan tombol terjemahkan.</p>
+
+                <div class="field-group">
+                    <label for="bahasa-asal">Bahasa asal</label>
+                    <select id="bahasa-asal">
+                        <option value="id">Indonesia</option>
+                        <option value="en">Inggris</option>
+                        <option value="ja">Jepang</option>
+                        <option value="ar">Arab</option>
+                    </select>
+                    <div class="textarea-tools">
+                        <span></span>
+                        <button class="clear-textarea" type="button" data-action="clear-textarea" data-target="teks-input">Clear</button>
+                    </div>
+                    <div class="textarea-wrap">
+                        <textarea id="teks-input" placeholder="Paste atau ketik kalimat di sini" rows="4"></textarea>
+                    </div>
+                </div>
+
+                <button class="primary-button" type="button" data-action="translate">Terjemahkan</button>
+
+                <div class="field-group">
+                    <label for="bahasa-tujuan">Bahasa tujuan</label>
+                    <select id="bahasa-tujuan">
+                        <option value="en" selected>Inggris</option>
+                        <option value="id">Indonesia</option>
+                        <option value="ja">Jepang</option>
+                        <option value="ar">Arab</option>
+                    </select>
+                    <div class="textarea-tools">
+                        <span></span>
+                        <button class="clear-textarea" type="button" data-action="clear-textarea" data-target="teks-hasil">Clear</button>
+                    </div>
+                    <div class="textarea-wrap">
+                        <textarea id="teks-hasil" placeholder="Hasil terjemahan" rows="4" readonly></textarea>
+                    </div>
+                </div>
+
+                <button class="secondary-button" type="button" data-action="copy-translation">Salin Hasil</button>
             </div>
-        </div>
+        </section>
 
-        <div id="translate" class="ruang-alat">
-            <button class="tombol-close" onclick="tutupModal()">✖</button>
-            
-            <h2>🌐 Penerjemah Teks</h2>
-            <p class="deskripsi-alat">Paste teksnya, lalu tekan Terjemahkan!</p>
+        <section id="barcode" class="tool-modal barcode-modal" data-modal-title="Barcode Generator" aria-label="Barcode generator">
+            <div class="modal-body">
+                <h2>Buat Barcode</h2>
+                <p class="tool-helper">Masukkan teks atau angka, pilih format, lalu barcode akan dibuat langsung.</p>
 
-            <div class="grup-input">
-                <select id="bahasa-asal">
-                    <option value="id">🇮🇩 Indonesia</option>
-                    <option value="en">🇬🇧 Inggris</option>
-                    <option value="ja">🇯🇵 Jepang</option>
-                    <option value="ar">🇸🇦 Arab</option>
-                </select>
-                <textarea id="teks-input" placeholder="Paste/ketik kalimat di sini..." rows="3"></textarea>
+                <div class="field-group">
+                    <label for="barcode-value">Isi barcode</label>
+                    <input type="text" id="barcode-value" value="TOTOOLS-2026" placeholder="Contoh: TOTOOLS-2026" data-action="barcode-live">
+                </div>
+
+                <div class="field-group">
+                    <label for="barcode-format">Format</label>
+                    <select id="barcode-format" data-action="barcode-live">
+                        <option value="CODE128" selected>CODE128</option>
+                        <option value="EAN13">EAN13</option>
+                        <option value="UPC">UPC</option>
+                        <option value="ITF14">ITF14</option>
+                    </select>
+                </div>
+
+                <div class="barcode-preview" aria-label="Preview barcode">
+                    <svg id="barcode-output"></svg>
+                </div>
+
+                <button class="primary-button" type="button" data-action="generate-barcode">Buat Barcode</button>
+                <button class="secondary-button" type="button" data-action="download-barcode">Download SVG</button>
             </div>
+        </section>
 
-            <button class="btn-aksi" onclick="jalankanTranslateManual()">🚀 Terjemahkan!</button>
+        <section id="qrcode" class="tool-modal qr-modal" data-modal-title="QR Code Generator" aria-label="QR Code generator">
+            <div class="modal-body">
+                <h2>Buat QR Code</h2>
+                <p class="tool-helper">Pakai mode solo untuk satu QR, atau batch untuk banyak QR dari beberapa baris teks.</p>
 
-            <div class="grup-input" style="margin-top: 15px;">
-                <select id="bahasa-tujuan">
-                    <option value="en" selected>🇬🇧 Inggris</option>
-                    <option value="id">🇮🇩 Indonesia</option>
-                    <option value="ja">🇯🇵 Jepang</option>
-                    <option value="ar">🇸🇦 Arab</option>
-                </select>
-                <textarea id="teks-hasil" placeholder="Hasil terjemahan..." rows="3" readonly></textarea>
+                <div class="segmented-control" role="tablist" aria-label="Mode QR Code">
+                    <button class="is-active" type="button" data-qr-tab="solo">Solo</button>
+                    <button type="button" data-qr-tab="batch">Batch</button>
+                </div>
+
+                <div class="toggle-row">
+                    <label for="qr-include-text">Include teks di bawah QR</label>
+                    <input type="checkbox" id="qr-include-text" data-action="qr-live" checked>
+                </div>
+
+                <div id="qr-panel-solo" class="qr-panel is-active">
+                    <div class="field-group">
+                        <label for="qr-value">Isi QR Code</label>
+                        <div class="textarea-tools">
+                            <span></span>
+                            <button class="clear-textarea" type="button" data-action="clear-textarea" data-target="qr-value">Clear</button>
+                        </div>
+                        <div class="textarea-wrap">
+                            <textarea id="qr-value" rows="4" placeholder="Contoh: https://totools.local" data-action="qr-live">https://totools.local</textarea>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="qr-size">Ukuran</label>
+                        <select id="qr-size" data-action="qr-live">
+                            <option value="180">180 px</option>
+                            <option value="220" selected>220 px</option>
+                            <option value="280">280 px</option>
+                        </select>
+                    </div>
+
+                    <div class="qr-preview" aria-label="Preview QR Code">
+                        <div id="qr-output"></div>
+                        <p id="qr-caption" class="qr-caption"></p>
+                    </div>
+
+                    <button class="primary-button" type="button" data-action="generate-qr">Buat QR Code</button>
+                    <button class="secondary-button" type="button" data-action="download-qr">Download PNG</button>
+                </div>
+
+                <div id="qr-panel-batch" class="qr-panel">
+                    <div class="field-group">
+                        <label for="qr-batch-value">Batch QR Code</label>
+                        <div class="textarea-tools">
+                            <span></span>
+                            <button class="clear-textarea" type="button" data-action="clear-textarea" data-target="qr-batch-value">Clear</button>
+                        </div>
+                        <div class="textarea-wrap">
+                            <textarea id="qr-batch-value" rows="7" placeholder="Satu QR per baris" data-action="qr-live">https://totools.local
+TOTOOLS-2026
+Halo Tuan Cecep</textarea>
+                        </div>
+                    </div>
+
+                    <div class="qr-preview batch-preview" aria-label="Preview batch QR Code">
+                        <div id="qr-batch-output"></div>
+                    </div>
+
+                    <button class="primary-button" type="button" data-action="generate-qr">Buat Batch</button>
+                    <button class="secondary-button" type="button" data-action="download-qr-batch">Download ZIP</button>
+                </div>
             </div>
-
-            <button class="btn-aksi btn-salin" onclick="salinTeks()">📋 Salin Hasil</button>
-        </div>
-
+        </section>
     </main>
 
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="assets/js/script.js"></script>
 </body>
 </html>
