@@ -302,6 +302,34 @@ p {
     font-size: 26px;
 }
 
+.widget-footer {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.widget-footer a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s ease;
+}
+
+.widget-footer a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.widget-footer .widget-domain {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
 .taskbar {
     position: fixed;
     right: 16px;
@@ -956,6 +984,18 @@ p {
     font-size: 14px;
 }
 
+.version-card a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s ease;
+}
+
+.version-card a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1130,6 +1170,20 @@ p {
 
     .desktop-widget h2 {
         font-size: 22px;
+    }
+
+    .widget-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    .widget-footer a {
+        color: #ffffff;
+        text-decoration: underline;
+    }
+
+    .widget-footer a:hover {
+        color: rgba(255, 255, 255, 0.9);
     }
 
     .taskbar {
