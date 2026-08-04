@@ -9,6 +9,7 @@ import { initCurrency } from './tools/currency.js';
 import { initQrCode } from './tools/qrcode.js';
 import { initTranslator } from './tools/translator.js';
 import { initWordCounter } from './tools/word-counter.js';
+import { initCollage } from './tools/collage.js';
 
 window.TOTOOLS_MODULE_BOOTED = true;
 
@@ -59,7 +60,8 @@ function initCoreEvents() {
             3: 'barcode',
             4: 'qrcode',
             5: 'settings',
-            6: 'wordcounter'
+            6: 'wordcounter',
+            7: 'collage'
         };
 
         if (pintasan[event.key]) {
@@ -117,6 +119,7 @@ function initApp() {
     initBarcode();
     initQrCode();
     initWordCounter();
+    initCollage();
     setInterval(perbaruiJamDesktop, 30000);
 }
 

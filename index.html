@@ -369,6 +369,10 @@ TOTOOLS-2026
                         <p>Word Count</p>
                     </div>
                     <div>
+                        <span>7</span>
+                        <p>Collage</p>
+                    </div>
+                    <div>
                         <span>Esc</span>
                         <p>Tutup modal</p>
                     </div>
@@ -423,6 +427,86 @@ TOTOOLS-2026
                         <p>Waktu baca</p>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section id="collage" class="tool-modal collage-modal" data-modal-title="Image Collage" aria-label="Image collage tool">
+            <div class="modal-body">
+                <h2>Image Collage</h2>
+                <p class="tool-helper">Upload gambar, atur layout, lalu download hasilnya sebagai PNG.</p>
+
+                <div class="collage-layout-row">
+                    <div class="field-group collage-field-inline">
+                        <label for="collage-layout">Layout</label>
+                        <select id="collage-layout">
+                            <option value="grid-2x2">2 × 2 (4 foto)</option>
+                            <option value="grid-3x3">3 × 3 (9 foto)</option>
+                            <option value="grid-1+2">Kiri Besar (3 foto)</option>
+                            <option value="grid-2+1">Kanan Besar (3 foto)</option>
+                            <option value="grid-row">3 Kolom (3 foto)</option>
+                            <option value="grid-col">3 Baris (3 foto)</option>
+                            <option value="grid-1x2">Side by Side (2 foto)</option>
+                            <option value="grid-2x1">Atas Bawah (2 foto)</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group collage-field-inline">
+                        <label for="collage-bg-color">Background</label>
+                        <div class="collage-color-row">
+                            <input type="color" id="collage-bg-color" value="#1a1a2e" aria-label="Pilih warna background">
+                            <span class="collage-color-presets">
+                                <button type="button" class="collage-preset-color" data-color="#1a1a2e" style="background:#1a1a2e" aria-label="Dark Navy"></button>
+                                <button type="button" class="collage-preset-color" data-color="#ffffff" style="background:#ffffff" aria-label="White"></button>
+                                <button type="button" class="collage-preset-color" data-color="#000000" style="background:#000000" aria-label="Black"></button>
+                                <button type="button" class="collage-preset-color" data-color="#f8f4ef" style="background:#f8f4ef" aria-label="Cream"></button>
+                                <button type="button" class="collage-preset-color" data-color="#0f2027" style="background:#0f2027" aria-label="Deep Dark"></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="collage-settings-row">
+                    <div class="field-group collage-field-inline">
+                        <label for="collage-gap">Jarak (px)</label>
+                        <div class="collage-range-row">
+                            <input type="range" id="collage-gap-range" min="0" max="40" value="8" aria-label="Atur jarak antar gambar">
+                            <input type="number" id="collage-gap" min="0" max="40" value="8" aria-label="Nilai jarak">
+                        </div>
+                    </div>
+
+                    <div class="field-group collage-field-inline">
+                        <label for="collage-radius">Sudut bulat (px)</label>
+                        <div class="collage-range-row">
+                            <input type="range" id="collage-radius-range" min="0" max="40" value="0" aria-label="Atur sudut gambar">
+                            <input type="number" id="collage-radius" min="0" max="40" value="0" aria-label="Nilai sudut bulat">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="collage-dropzone" class="collage-dropzone" role="button" tabindex="0" aria-label="Upload gambar dengan klik atau drag & drop">
+                    <svg viewBox="0 0 24 24" class="collage-drop-icon" aria-hidden="true"><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M16 8l-4-4-4 4M12 4v12"/></svg>
+                    <p>Drag & drop gambar ke sini</p>
+                    <span>atau</span>
+                    <button class="secondary-button" id="collage-upload-btn" type="button">Pilih Gambar</button>
+                    <input type="file" id="collage-file-input" accept="image/*" multiple hidden aria-hidden="true">
+                </div>
+
+                <div id="collage-image-list" class="collage-image-list" aria-label="Daftar gambar yang diupload">
+                    <p class="collage-empty-list">Belum ada gambar.</p>
+                </div>
+
+                <div id="collage-preview-wrapper" class="collage-preview-wrapper" aria-label="Preview kolase">
+                    <p class="collage-preview-empty">Preview kolase akan tampil di sini setelah gambar diupload.</p>
+                </div>
+
+                <div class="collage-actions">
+                    <button class="primary-button" type="button" id="collage-generate-btn">Buat Kolase</button>
+                    <button class="secondary-button" type="button" id="collage-download-btn">Download PNG</button>
+                    <button class="secondary-button" type="button" id="collage-reset-btn">Reset</button>
+                </div>
+
+                <canvas id="collage-canvas" aria-hidden="true" style="display:none; max-width:100%; border-radius: 8px; margin-top: 12px;"></canvas>
+                <p id="collage-canvas-status" class="library-status" role="status" aria-live="polite" hidden></p>
             </div>
         </section>
     </main>

@@ -1,0 +1,42 @@
+.translate-modal {
+    width: min(680px, calc(100% - 40px));
+}
+
+.textarea-wrap {
+    display: block;
+}
+
+.textarea-wrap textarea {
+    display: block;
+}
+
+.textarea-tools {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 28px;
+    margin: -2px 0 2px;
+}
+
+.clear-textarea {
+    min-height: 26px;
+    padding: 4px 9px;
+    color: #475569;
+    background: rgba(241, 245, 249, 0.92);
+    border: 1px solid rgba(203, 213, 225, 0.9);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.clear-textarea:hover {
+    color: #0f172a;
+    background: #ffffff;
+}
+
+@media (max-width: 720px) {
+    .translate-modal {
+        width: 100%;
+    }
+}

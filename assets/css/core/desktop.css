@@ -1,0 +1,403 @@
+.desktop {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    padding: 32px 32px 86px;
+    background:
+        radial-gradient(circle at 18% 16%, rgba(125, 211, 252, 0.75), transparent 30%),
+        radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.8), transparent 28%),
+        linear-gradient(135deg, #0f766e 0%, #1d4ed8 44%, #312e81 100%);
+}
+
+.desktop.theme-soft {
+    background:
+        radial-gradient(circle at 18% 16%, rgba(255, 255, 255, 0.82), transparent 26%),
+        radial-gradient(circle at 84% 20%, rgba(251, 113, 133, 0.58), transparent 28%),
+        linear-gradient(145deg, #38bdf8 0%, #a78bfa 46%, #fb7185 100%);
+}
+
+.desktop.theme-focus {
+    background:
+        radial-gradient(circle at 22% 18%, rgba(52, 211, 153, 0.52), transparent 28%),
+        radial-gradient(circle at 82% 18%, rgba(59, 130, 246, 0.48), transparent 30%),
+        linear-gradient(135deg, #020617 0%, #0f172a 45%, #164e63 100%);
+}
+
+.mobile-statusbar {
+    display: none;
+}
+
+.desktop::before {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: '';
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.75), transparent);
+}
+
+.desktop-info {
+    position: absolute;
+    right: 34px;
+    top: 34px;
+    z-index: 2;
+    width: min(430px, calc(100% - 68px));
+}
+
+.desktop-note,
+.desktop-widget {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.56);
+    box-shadow: 0 28px 90px rgba(15, 23, 42, 0.28);
+    backdrop-filter: blur(22px);
+}
+
+.desktop-note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 14px;
+    color: #334155;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.note-label {
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+.desktop-widget p:last-child {
+    margin: 12px 0 0;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.shortcut-area {
+    position: relative;
+    z-index: 2;
+    width: calc(100vw - 64px);
+    height: calc(100vh - 206px);
+    margin-bottom: 70px;
+}
+
+.tool-card {
+    position: absolute;
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    min-height: 116px;
+    padding: 8px 6px;
+    color: #ffffff;
+    text-align: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    text-shadow: 0 1px 8px rgba(15, 23, 42, 0.35);
+    transition: background 0.16s ease, transform 0.16s ease, border-color 0.16s ease;
+    user-select: none;
+    touch-action: none;
+}
+
+.tool-card:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-2px);
+}
+
+.tool-card.is-selected {
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.34);
+}
+
+.tool-card.is-dragging {
+    opacity: 0.55;
+    transform: scale(1.04);
+}
+
+.tool-card.is-positioned {
+    transition: background 0.16s ease, border-color 0.16s ease, opacity 0.16s ease;
+}
+
+.tool-card:active {
+    transform: scale(0.97);
+}
+
+.tool-icon {
+    display: grid;
+    width: 62px;
+    height: 62px;
+    place-items: center;
+    color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.25);
+    font-size: 20px;
+    font-weight: 800;
+    text-shadow: none;
+}
+
+.tool-icon svg {
+    width: 34px;
+    height: 34px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.money {
+    background: linear-gradient(145deg, #16a34a, #22c55e);
+}
+
+.translate {
+    background: linear-gradient(145deg, #2563eb, #60a5fa);
+}
+
+.barcode {
+    background: linear-gradient(145deg, #334155, #111827);
+}
+
+.qr {
+    background: linear-gradient(145deg, #7c3aed, #c084fc);
+}
+
+.settings {
+    background: linear-gradient(145deg, #f97316, #facc15);
+}
+
+.word {
+    background: linear-gradient(145deg, #0891b2, #67e8f9);
+}
+
+.tool-title {
+    display: block;
+    max-width: 86px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.tool-desc {
+    display: none;
+}
+
+.desktop-widget {
+    position: absolute;
+    right: 34px;
+    bottom: 104px;
+    z-index: 2;
+    width: 320px;
+    padding: 22px;
+    border-radius: 12px;
+}
+
+.desktop-widget h2 {
+    margin: 0;
+    font-size: 26px;
+}
+
+.widget-footer {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.widget-footer a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.15s ease;
+}
+
+.widget-footer a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.widget-footer .widget-domain {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+@media (max-width: 720px) {
+    body {
+        background: #111827;
+    }
+
+    .desktop {
+        display: flex;
+        min-height: 100svh;
+        flex-direction: column;
+        padding: max(12px, env(safe-area-inset-top)) 18px calc(104px + env(safe-area-inset-bottom));
+        overflow-y: auto;
+        background:
+            radial-gradient(circle at 24% 6%, rgba(255, 255, 255, 0.55), transparent 24%),
+            linear-gradient(160deg, #60a5fa 0%, #a78bfa 45%, #fb7185 100%);
+    }
+
+    .mobile-statusbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 28px;
+        margin-bottom: 22px;
+        padding: 0 8px;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 800;
+        text-shadow: 0 1px 7px rgba(15, 23, 42, 0.22);
+    }
+
+    .status-icons {
+        display: inline-flex;
+        align-items: end;
+        gap: 5px;
+    }
+
+    .status-icons span {
+        display: block;
+        background: #ffffff;
+        border-radius: 999px;
+    }
+
+    .status-icons span:nth-child(1) {
+        width: 4px;
+        height: 8px;
+    }
+
+    .status-icons span:nth-child(2) {
+        width: 4px;
+        height: 12px;
+    }
+
+    .status-icons span:nth-child(3) {
+        width: 20px;
+        height: 10px;
+        border: 1.5px solid #ffffff;
+        background: transparent;
+        border-radius: 3px;
+    }
+
+    .desktop::before {
+        display: none;
+    }
+
+    .desktop-info {
+        position: static;
+        width: 100%;
+        margin-bottom: 24px;
+    }
+
+    .desktop-note {
+        display: none;
+    }
+
+    .shortcut-area {
+        display: grid;
+        width: 100%;
+        height: auto;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px 12px;
+        justify-items: center;
+        margin: 10px auto 0;
+    }
+
+    .tool-card {
+        position: static;
+        width: 100%;
+        max-width: 96px;
+        min-height: 112px;
+        padding: 0;
+        color: #ffffff;
+        border: 0;
+        border-radius: 18px;
+        touch-action: manipulation;
+    }
+
+    .tool-card:hover {
+        background: transparent;
+        border-color: transparent;
+        transform: none;
+    }
+
+    .tool-card.is-selected {
+        background: transparent;
+        border-color: transparent;
+    }
+
+    .tool-icon {
+        width: 66px;
+        height: 66px;
+        border-radius: 20px;
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.28);
+        font-size: 20px;
+    }
+
+    .tool-icon svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .tool-title {
+        max-width: 90px;
+        font-size: 12px;
+        text-shadow: 0 1px 7px rgba(15, 23, 42, 0.28);
+    }
+
+    .desktop-widget {
+        position: static;
+        width: 100%;
+        margin-top: auto;
+        padding: 16px 18px;
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 22px;
+        box-shadow: none;
+    }
+
+    .desktop-widget .eyebrow,
+    .desktop-widget p:last-child {
+        color: rgba(255, 255, 255, 0.78);
+    }
+
+    .desktop-widget h2 {
+        font-size: 22px;
+    }
+
+    .widget-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    .widget-footer a {
+        color: #ffffff;
+        text-decoration: underline;
+    }
+
+    .widget-footer a:hover {
+        color: rgba(255, 255, 255, 0.9);
+    }
+}

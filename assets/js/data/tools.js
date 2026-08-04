@@ -46,6 +46,14 @@ const daftarToolsDasar = [
         ikonClass: 'word',
         labelAkses: 'Buka word counter',
         ikonPath: 'M5 5h14M5 9h14M5 13h9M5 17h6'
+    },
+    {
+        id: 'collage',
+        nama: 'Collage',
+        deskripsi: 'Kolase gambar',
+        ikonClass: 'collage',
+        labelAkses: 'Buka image collage',
+        ikonPath: 'M3 3h8v8H3V3Zm0 10h8v8H3v-8Zm10-10h8v8h-8V3Zm0 10h4v4h-4v-4Zm4 4h4v4h-4v-4Zm-4 4h4v4h-4v-4Z'
     }
 ];
 

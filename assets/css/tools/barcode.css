@@ -1,0 +1,29 @@
+.barcode-modal {
+    width: min(560px, calc(100% - 40px));
+}
+
+.barcode-preview {
+    display: grid;
+    min-height: 170px;
+    margin: 18px 0 16px;
+    padding: 16px;
+    place-items: center;
+    overflow-x: auto;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 12px;
+}
+
+.barcode-preview svg {
+    max-width: 100%;
+}
+
+.barcode-preview + .primary-button {
+    margin-bottom: 10px;
+}
+
+@media (max-width: 720px) {
+    .barcode-modal {
+        width: 100%;
+    }
+}
