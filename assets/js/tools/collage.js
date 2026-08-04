@@ -5,6 +5,7 @@ let layoutDipilih = 'grid-2x2';
 let warnaBg = '#1a1a2e';
 let jarakAntar = 8;
 let sudutBulat = 0;
+let slotDipilih = null;
 
 const LAYOUTS = {
     'grid-2x2': { cols: 2, rows: 2, slots: 4, label: '2 × 2' },
@@ -30,6 +31,12 @@ export function initCollage() {
     const inputSudut = document.getElementById('collage-radius');
     const rangeJarak = document.getElementById('collage-gap-range');
     const rangeSudut = document.getElementById('collage-radius-range');
+
+    // Controls for image zoom & pan adjustment
+    const inputZoom = document.getElementById('collage-zoom');
+    const inputOffsetX = document.getElementById('collage-offset-x');
+    const inputOffsetY = document.getElementById('collage-offset-y');
+    const btnResetAdjust = document.getElementById('collage-adjust-reset');
 
     if (!btnUpload) return;
 
@@ -77,6 +84,7 @@ export function initCollage() {
     // Layout selector
     selectLayout?.addEventListener('change', (e) => {
         layoutDipilih = e.target.value;
+        slotDipilih = null;
         renderPreviewKolase();
     });
 
@@ -114,6 +122,37 @@ export function initCollage() {
         });
     }
 
+    // Adjust panel sliders
+    inputZoom?.addEventListener('input', (e) => {
+        if (slotDipilih === null || !gambarDiunggah[slotDipilih]) return;
+        const val = parseFloat(e.target.value);
+        gambarDiunggah[slotDipilih].zoom = val;
+        document.getElementById('collage-zoom-val').textContent = `${val.toFixed(2)}x`;
+        updateSlotTransform(slotDipilih);
+    });
+
+    inputOffsetX?.addEventListener('input', (e) => {
+        if (slotDipilih === null || !gambarDiunggah[slotDipilih]) return;
+        gambarDiunggah[slotDipilih].offsetX = parseInt(e.target.value, 10);
+        updateSlotTransform(slotDipilih);
+    });
+
+    inputOffsetY?.addEventListener('input', (e) => {
+        if (slotDipilih === null || !gambarDiunggah[slotDipilih]) return;
+        gambarDiunggah[slotDipilih].offsetY = parseInt(e.target.value, 10);
+        updateSlotTransform(slotDipilih);
+    });
+
+    btnResetAdjust?.addEventListener('click', () => {
+        if (slotDipilih === null || !gambarDiunggah[slotDipilih]) return;
+        gambarDiunggah[slotDipilih].zoom = 1;
+        gambarDiunggah[slotDipilih].offsetX = 0;
+        gambarDiunggah[slotDipilih].offsetY = 0;
+        syncAdjustPanelValues();
+        updateSlotTransform(slotDipilih);
+        tampilkanToast(`Posisi gambar #${slotDipilih + 1} direset.`);
+    });
+
     // Generate
     btnGenerate?.addEventListener('click', () => {
         if (gambarDiunggah.length === 0) {
@@ -136,34 +175,111 @@ export function initCollage() {
     // Reset
     btnReset?.addEventListener('click', () => {
         gambarDiunggah = [];
+        slotDipilih = null;
         renderDaftarGambar();
+        renderPreviewKolase();
         bersihkanCanvas();
         tampilkanToast('Gambar direset.');
     });
 }
 
-function tambahGambar(files) {
-    const layout = LAYOUTS[layoutDipilih];
-    const maks = layout ? layout.slots : 9;
+const MAX_DIMENSION = 2048;
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB max per file
 
+async function tambahGambar(files) {
     const valid = files.filter((f) => f.type.startsWith('image/'));
     if (valid.length === 0) {
         tampilkanToast('Hanya file gambar yang didukung.');
         return;
     }
 
-    valid.forEach((file) => {
-        if (gambarDiunggah.length >= 9) return;
+    let adaYangDikompres = false;
+    let ditambahkan = 0;
+
+    for (const file of valid) {
+        if (gambarDiunggah.length >= 9) {
+            tampilkanToast('Maksimal 9 gambar per kolase.');
+            break;
+        }
+
+        try {
+            const hasil = await kompresGambar(file);
+            gambarDiunggah.push({
+                src: hasil.src,
+                nama: hasil.nama,
+                zoom: 1,
+                offsetX: 0,
+                offsetY: 0
+            });
+            if (hasil.dikompres) adaYangDikompres = true;
+            ditambahkan++;
+        } catch (err) {
+            tampilkanToast(err.message || `Gagal memproses ${file.name}`);
+        }
+    }
+
+    if (ditambahkan > 0) {
+        renderDaftarGambar();
+        renderPreviewKolase();
+        if (adaYangDikompres) {
+            tampilkanToast(`${ditambahkan} gambar ditambahkan (otomatis dioptimasi).`);
+        } else {
+            tampilkanToast(`${ditambahkan} gambar ditambahkan.`);
+        }
+    }
+}
+
+async function kompresGambar(file) {
+    if (file.size > MAX_FILE_SIZE) {
+        throw new Error(`File ${file.name} terlalu besar (maksimal 50MB).`);
+    }
+
+    const dataUrl = await readFileAsDataURL(file);
+    const img = await loadImageFromSrc(dataUrl);
+
+    let { width, height } = img;
+    
+    // Jika dimensi & ukuran file sudah kecil, tidak perlu dikompresi lagi
+    if (width <= MAX_DIMENSION && height <= MAX_DIMENSION && file.size < 2 * 1024 * 1024) {
+        return { src: dataUrl, nama: file.name, dikompres: false };
+    }
+
+    // Hitung rasio kecilan
+    let scale = 1;
+    if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        scale = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+    }
+
+    const newWidth = Math.round(width * scale);
+    const newHeight = Math.round(height * scale);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = newWidth;
+    canvas.height = newHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+    // Kompres ke JPEG kualitas 88%
+    const compressedSrc = canvas.toDataURL('image/jpeg', 0.88);
+    return { src: compressedSrc, nama: file.name, dikompres: true };
+}
+
+function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = (e) => {
-            gambarDiunggah.push({ src: e.target.result, nama: file.name });
-            renderDaftarGambar();
-            renderPreviewKolase();
-        };
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = reject;
         reader.readAsDataURL(file);
     });
+}
 
-    tampilkanToast(`${valid.length} gambar ditambahkan.`);
+function loadImageFromSrc(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
 }
 
 function renderDaftarGambar() {
@@ -176,19 +292,28 @@ function renderDaftarGambar() {
     }
 
     container.innerHTML = gambarDiunggah.map((gambar, idx) => `
-        <div class="collage-thumb" draggable="true" data-idx="${idx}">
+        <div class="collage-thumb ${slotDipilih === idx ? 'is-selected' : ''}" draggable="true" data-idx="${idx}">
             <img src="${gambar.src}" alt="${gambar.nama}" loading="lazy">
             <button class="collage-thumb-remove" type="button" data-remove="${idx}" aria-label="Hapus gambar ${idx + 1}">×</button>
             <span class="collage-thumb-num">${idx + 1}</span>
         </div>
     `).join('');
 
-    // Bind remove buttons
+    // Bind thumbnail selection & remove
+    container.querySelectorAll('.collage-thumb').forEach((thumb) => {
+        thumb.addEventListener('click', () => {
+            const idx = parseInt(thumb.dataset.idx, 10);
+            pilihSlot(idx);
+        });
+    });
+
     container.querySelectorAll('[data-remove]').forEach((btn) => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const idx = parseInt(btn.dataset.remove, 10);
             gambarDiunggah.splice(idx, 1);
+            if (slotDipilih === idx) slotDipilih = null;
+            else if (slotDipilih > idx) slotDipilih--;
             renderDaftarGambar();
             renderPreviewKolase();
         });
@@ -224,6 +349,7 @@ function bindDragReorderThumbs(container) {
             if (dragIdx !== null && dragIdx !== dropIdx) {
                 const moved = gambarDiunggah.splice(dragIdx, 1)[0];
                 gambarDiunggah.splice(dropIdx, 0, moved);
+                slotDipilih = dropIdx;
                 renderDaftarGambar();
                 renderPreviewKolase();
             }
@@ -237,6 +363,7 @@ function renderPreviewKolase() {
 
     if (gambarDiunggah.length === 0) {
         wrapper.innerHTML = '<p class="collage-preview-empty">Preview kolase akan tampil di sini setelah gambar diupload.</p>';
+        sebunyikanAdjustPanel();
         return;
     }
 
@@ -276,14 +403,23 @@ function renderPreviewKolase() {
 
     const items = imgsToUse.map((gambar, idx) => {
         let itemStyle = '';
-        // Special spanning for asymmetric layouts
         if (layoutDipilih === 'grid-1+2' && idx === 0) {
             itemStyle = 'grid-row: 1 / 3;';
         }
         if (layoutDipilih === 'grid-2+1' && idx === 2) {
             itemStyle = 'grid-column: 2; grid-row: 1 / 3;';
         }
-        return `<div class="collage-slot" style="${itemStyle} border-radius: ${sudutBulat}px; overflow: hidden;"><img src="${gambar.src}" alt="${gambar.nama}" style="width:100%;height:100%;object-fit:cover;border-radius:${sudutBulat}px;"></div>`;
+
+        const isSelected = slotDipilih === idx;
+        const zoom = gambar.zoom || 1;
+        const offX = gambar.offsetX || 0;
+        const offY = gambar.offsetY || 0;
+
+        return `
+            <div class="collage-slot ${isSelected ? 'is-selected' : ''}" data-slot-idx="${idx}" style="${itemStyle} border-radius: ${sudutBulat}px;">
+                <img src="${gambar.src}" alt="${gambar.nama}" style="border-radius:${sudutBulat}px; transform: scale(${zoom}) translate(${offX / zoom}%, ${offY / zoom}%); transform-origin: center center;">
+            </div>
+        `;
     }).join('');
 
     // Fill missing slots with placeholders
@@ -297,6 +433,147 @@ function renderPreviewKolase() {
             ${items}${placeholders}
         </div>
     `;
+
+    bindSlotInteractions(wrapper);
+
+    if (slotDipilih !== null && slotDipilih < imgsToUse.length) {
+        tampilkanAdjustPanel();
+    } else {
+        sebunyikanAdjustPanel();
+    }
+}
+
+function bindSlotInteractions(wrapper) {
+    wrapper.querySelectorAll('.collage-slot[data-slot-idx]').forEach((slotEl) => {
+        const idx = parseInt(slotEl.dataset.slot-idx, 10);
+        let isPointerDown = false;
+        let startX = 0;
+        let startY = 0;
+        let initOffX = 0;
+        let initOffY = 0;
+
+        slotEl.addEventListener('pointerdown', (e) => {
+            isPointerDown = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const g = gambarDiunggah[idx];
+            initOffX = g ? (g.offsetX || 0) : 0;
+            initOffY = g ? (g.offsetY || 0) : 0;
+            slotEl.setPointerCapture(e.pointerId);
+            pilihSlot(idx);
+        });
+
+        slotEl.addEventListener('pointermove', (e) => {
+            if (!isPointerDown) return;
+            const g = gambarDiunggah[idx];
+            if (!g) return;
+
+            const rect = slotEl.getBoundingClientRect();
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            const percentX = (deltaX / rect.width) * 100;
+            const percentY = (deltaY / rect.height) * 100;
+
+            const zoom = g.zoom || 1;
+            g.offsetX = Math.max(-100, Math.min(100, Math.round(initOffX + percentX * zoom)));
+            g.offsetY = Math.max(-100, Math.min(100, Math.round(initOffY + percentY * zoom)));
+
+            updateSlotTransform(idx);
+            syncAdjustPanelValues();
+        });
+
+        const stopPointer = (e) => {
+            if (isPointerDown) {
+                isPointerDown = false;
+                try { slotEl.releasePointerCapture(e.pointerId); } catch (err) {}
+            }
+        };
+
+        slotEl.addEventListener('pointerup', stopPointer);
+        slotEl.addEventListener('pointercancel', stopPointer);
+
+        // Mouse Wheel Zoom In / Out
+        slotEl.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const g = gambarDiunggah[idx];
+            if (!g) return;
+
+            pilihSlot(idx);
+
+            const currentZoom = g.zoom || 1;
+            const delta = e.deltaY < 0 ? 0.08 : -0.08;
+            const newZoom = Math.max(1, Math.min(3, Math.round((currentZoom + delta) * 100) / 100));
+
+            g.zoom = newZoom;
+            updateSlotTransform(idx);
+            syncAdjustPanelValues();
+        }, { passive: false });
+    });
+}
+
+function pilihSlot(idx) {
+    if (idx < 0 || idx >= gambarDiunggah.length) return;
+    slotDipilih = idx;
+
+    // Update active highlight in preview grid
+    document.querySelectorAll('.collage-slot[data-slot-idx]').forEach((el) => {
+        const slotIdx = parseInt(el.dataset.slot-idx, 10);
+        el.classList.toggle('is-selected', slotIdx === idx);
+    });
+
+    // Update active highlight in thumbnail list
+    document.querySelectorAll('.collage-thumb').forEach((thumb) => {
+        const thumbIdx = parseInt(thumb.dataset.idx, 10);
+        thumb.classList.toggle('is-selected', thumbIdx === idx);
+    });
+
+    tampilkanAdjustPanel();
+}
+
+function updateSlotTransform(idx) {
+    const slotEl = document.querySelector(`.collage-slot[data-slot-idx="${idx}"]`);
+    const imgEl = slotEl?.querySelector('img');
+    const g = gambarDiunggah[idx];
+    if (!imgEl || !g) return;
+
+    const zoom = g.zoom || 1;
+    const offX = g.offsetX || 0;
+    const offY = g.offsetY || 0;
+    imgEl.style.transform = `scale(${zoom}) translate(${offX / zoom}%, ${offY / zoom}%)`;
+}
+
+function tampilkanAdjustPanel() {
+    const panel = document.getElementById('collage-adjust-panel');
+    const title = document.getElementById('collage-adjust-title');
+    if (!panel || slotDipilih === null || !gambarDiunggah[slotDipilih]) return;
+
+    panel.hidden = false;
+    if (title) title.textContent = `Atur Gambar #${slotDipilih + 1}`;
+    syncAdjustPanelValues();
+}
+
+function sebunyikanAdjustPanel() {
+    const panel = document.getElementById('collage-adjust-panel');
+    if (panel) panel.hidden = true;
+}
+
+function syncAdjustPanelValues() {
+    if (slotDipilih === null || !gambarDiunggah[slotDipilih]) return;
+    const g = gambarDiunggah[slotDipilih];
+    const zoom = g.zoom || 1;
+    const offX = g.offsetX || 0;
+    const offY = g.offsetY || 0;
+
+    const inputZoom = document.getElementById('collage-zoom');
+    const inputOffsetX = document.getElementById('collage-offset-x');
+    const inputOffsetY = document.getElementById('collage-offset-y');
+    const labelZoom = document.getElementById('collage-zoom-val');
+
+    if (inputZoom) inputZoom.value = zoom;
+    if (inputOffsetX) inputOffsetX.value = offX;
+    if (inputOffsetY) inputOffsetY.value = offY;
+    if (labelZoom) labelZoom.textContent = `${zoom.toFixed(2)}x`;
 }
 
 function bersihkanCanvas() {
@@ -349,17 +626,23 @@ async function buatKolaseCanvas() {
         // Compute slot rects
         const rects = hitungRects(layoutDipilih, CANVAS_W, CANVAS_H, GAP, PADDING, slots, loadedImgs.length);
 
-        // Draw each image
+        // Draw each image with zoom & pan
         loadedImgs.forEach((img, i) => {
             if (!rects[i]) return;
             const { x, y, w, h } = rects[i];
+            const g = imgsToUse[i];
+            const zoom = g.zoom || 1;
+            const offX = g.offsetX || 0;
+            const offY = g.offsetY || 0;
+
             ctx.save();
             if (RADIUS > 0) {
                 bulatKanvas(ctx, x, y, w, h, RADIUS);
                 ctx.clip();
             }
-            // Draw cover-fit
-            const { sx, sy, sw, sh } = coverFit(img.naturalWidth, img.naturalHeight, w, h);
+
+            // Calculate cover-fit + zoom + offset
+            const { sx, sy, sw, sh } = coverFit(img.naturalWidth, img.naturalHeight, w, h, zoom, offX, offY);
             ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
             ctx.restore();
         });
@@ -380,15 +663,6 @@ async function buatKolaseCanvas() {
         }
         tampilkanToast('Gagal memproses gambar.');
     }
-}
-
-function loadImage(gambar) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = gambar.src;
-    });
 }
 
 function hitungRects(layout, W, H, gap, pad, slots, count) {
@@ -441,7 +715,7 @@ function hitungRects(layout, W, H, gap, pad, slots, count) {
         case 'grid-col': {
             const ch = (inner_h - gap * 2) / 3;
             for (let r = 0; r < 3; r++) {
-                rects.push({ x: pad, y: pad + r * (ch + gap), w: inner_w, h: ch });
+                rects.push({ x: pad, y: pad, w: inner_w, h: ch });
             }
             break;
         }
@@ -464,16 +738,30 @@ function hitungRects(layout, W, H, gap, pad, slots, count) {
     return rects;
 }
 
-function coverFit(imgW, imgH, boxW, boxH) {
+function coverFit(imgW, imgH, boxW, boxH, zoom = 1, offsetX = 0, offsetY = 0) {
     const scaleX = boxW / imgW;
     const scaleY = boxH / imgH;
-    const scale = Math.max(scaleX, scaleY);
-    const scaledW = imgW * scale;
-    const scaledH = imgH * scale;
-    const sx = (scaledW - boxW) / 2 / scale;
-    const sy = (scaledH - boxH) / 2 / scale;
-    const sw = boxW / scale;
-    const sh = boxH / scale;
+    const baseScale = Math.max(scaleX, scaleY);
+    const totalScale = baseScale * (zoom || 1);
+
+    const scaledW = imgW * totalScale;
+    const scaledH = imgH * totalScale;
+
+    // Pan shift in canvas coordinate system
+    const maxShiftX = Math.max(0, (scaledW - boxW) / 2);
+    const maxShiftY = Math.max(0, (scaledH - boxH) / 2);
+
+    const shiftX = ((offsetX || 0) / 100) * (maxShiftX + boxW * 0.5);
+    const shiftY = ((offsetY || 0) / 100) * (maxShiftY + boxH * 0.5);
+
+    const cropLeft = (scaledW - boxW) / 2 - shiftX;
+    const cropTop = (scaledH - boxH) / 2 - shiftY;
+
+    const sx = Math.max(0, Math.min(imgW - 10, cropLeft / totalScale));
+    const sy = Math.max(0, Math.min(imgH - 10, cropTop / totalScale));
+    const sw = Math.min(imgW - sx, boxW / totalScale);
+    const sh = Math.min(imgH - sy, boxH / totalScale);
+
     return { sx, sy, sw, sh };
 }
 

@@ -499,6 +499,28 @@ TOTOOLS-2026
                     <p class="collage-preview-empty">Preview kolase akan tampil di sini setelah gambar diupload.</p>
                 </div>
 
+                <div id="collage-adjust-panel" class="collage-adjust-panel" hidden aria-label="Pengaturan zoom dan posisi gambar">
+                    <div class="collage-adjust-header">
+                        <strong id="collage-adjust-title">Atur Gambar #1</strong>
+                        <button type="button" id="collage-adjust-reset" class="clear-textarea">Reset Posisi</button>
+                    </div>
+                    <div class="collage-adjust-grid">
+                        <div class="field-group collage-field-inline">
+                            <label for="collage-zoom">Zoom (<span id="collage-zoom-val">1.0x</span>)</label>
+                            <input type="range" id="collage-zoom" min="1" max="3" step="0.05" value="1">
+                        </div>
+                        <div class="field-group collage-field-inline">
+                            <label for="collage-offset-x">Geser X</label>
+                            <input type="range" id="collage-offset-x" min="-100" max="100" step="1" value="0">
+                        </div>
+                        <div class="field-group collage-field-inline">
+                            <label for="collage-offset-y">Geser Y</label>
+                            <input type="range" id="collage-offset-y" min="-100" max="100" step="1" value="0">
+                        </div>
+                    </div>
+                    <p class="collage-adjust-tip">💡 Tip: <strong>Scroll mouse</strong> pada gambar untuk Zoom In/Out, <strong>klik & drag</strong> untuk menggeser gambar.</p>
+                </div>
+
                 <div class="collage-actions">
                     <button class="primary-button" type="button" id="collage-generate-btn">Buat Kolase</button>
                     <button class="secondary-button" type="button" id="collage-download-btn">Download PNG</button>
