@@ -258,7 +258,7 @@
 
 .collage-slot {
     overflow: hidden;
-    background: #cbd5e1;
+    background: transparent;
     position: relative;
     cursor: grab;
     user-select: none;
@@ -315,6 +315,10 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 10px;
+}
+
+.collage-adjust-panel {
+    display: none !important;
 }
 
 .collage-adjust-header strong {

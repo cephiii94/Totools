@@ -66,7 +66,10 @@ export function initCollage() {
         tambahGambar(files);
     });
 
-    dropzone?.addEventListener('click', () => inputFile?.click());
+    dropzone?.addEventListener('click', (e) => {
+        if (e.target.closest('#collage-upload-btn')) return;
+        inputFile?.click();
+    });
 
     // Preset colors
     document.querySelectorAll('.collage-preset-color').forEach((btn) => {
@@ -445,7 +448,7 @@ function renderPreviewKolase() {
 
 function bindSlotInteractions(wrapper) {
     wrapper.querySelectorAll('.collage-slot[data-slot-idx]').forEach((slotEl) => {
-        const idx = parseInt(slotEl.dataset.slot-idx, 10);
+        const idx = parseInt(slotEl.dataset.slotIdx, 10);
         let isPointerDown = false;
         let startX = 0;
         let startY = 0;
@@ -503,12 +506,66 @@ function bindSlotInteractions(wrapper) {
 
             const currentZoom = g.zoom || 1;
             const delta = e.deltaY < 0 ? 0.08 : -0.08;
-            const newZoom = Math.max(1, Math.min(3, Math.round((currentZoom + delta) * 100) / 100));
+            const newZoom = Math.max(0.2, Math.min(3, Math.round((currentZoom + delta) * 100) / 100));
 
             g.zoom = newZoom;
             updateSlotTransform(idx);
             syncAdjustPanelValues();
         }, { passive: false });
+
+        // Multi-touch Pinch Zoom (2 fingers) for Mobile Browsers
+        let initialTouchDist = 0;
+        let initialTouchZoom = 1;
+
+        slotEl.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                isPointerDown = false;
+                const g = gambarDiunggah[idx];
+                if (!g) return;
+                pilihSlot(idx);
+                initialTouchZoom = g.zoom || 1;
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                initialTouchDist = Math.hypot(dx, dy);
+            }
+        }, { passive: true });
+
+        slotEl.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialTouchDist > 0) {
+                e.preventDefault();
+                const g = gambarDiunggah[idx];
+                if (!g) return;
+
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const currentDist = Math.hypot(dx, dy);
+
+                if (currentDist > 0) {
+                    const scaleFactor = currentDist / initialTouchDist;
+                    const newZoom = Math.max(0.2, Math.min(3, Math.round(initialTouchZoom * scaleFactor * 100) / 100));
+                    g.zoom = newZoom;
+                    updateSlotTransform(idx);
+                    syncAdjustPanelValues();
+                }
+            }
+        }, { passive: false });
+
+        slotEl.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                initialTouchDist = 0;
+            }
+        });
+
+        // Double-click to reset zoom and pan position
+        slotEl.addEventListener('dblclick', () => {
+            const g = gambarDiunggah[idx];
+            if (!g) return;
+            g.zoom = 1;
+            g.offsetX = 0;
+            g.offsetY = 0;
+            updateSlotTransform(idx);
+            tampilkanToast(`Posisi gambar #${idx + 1} direset.`);
+        });
     });
 }
 
@@ -518,7 +575,7 @@ function pilihSlot(idx) {
 
     // Update active highlight in preview grid
     document.querySelectorAll('.collage-slot[data-slot-idx]').forEach((el) => {
-        const slotIdx = parseInt(el.dataset.slot-idx, 10);
+        const slotIdx = parseInt(el.dataset.slotIdx, 10);
         el.classList.toggle('is-selected', slotIdx === idx);
     });
 
@@ -607,7 +664,7 @@ async function buatKolaseCanvas() {
 
     try {
         // Load all images
-        const loadedImgs = await Promise.all(imgsToUse.map(loadImage));
+        const loadedImgs = await Promise.all(imgsToUse.map((g) => loadImageFromSrc(g.src)));
 
         const CANVAS_W = 1200;
         const CANVAS_H = 1200;
@@ -635,15 +692,16 @@ async function buatKolaseCanvas() {
             const offX = g.offsetX || 0;
             const offY = g.offsetY || 0;
 
+            const nw = img.naturalWidth || img.width || 1;
+            const nh = img.naturalHeight || img.height || 1;
+
             ctx.save();
             if (RADIUS > 0) {
                 bulatKanvas(ctx, x, y, w, h, RADIUS);
                 ctx.clip();
             }
 
-            // Calculate cover-fit + zoom + offset
-            const { sx, sy, sw, sh } = coverFit(img.naturalWidth, img.naturalHeight, w, h, zoom, offX, offY);
-            ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+            drawSlotImage(ctx, img, nw, nh, x, y, w, h, zoom, offX, offY);
             ctx.restore();
         });
 
@@ -657,8 +715,9 @@ async function buatKolaseCanvas() {
 
         tampilkanToast('Kolase berhasil dibuat!');
     } catch (err) {
+        console.error('Error buatKolaseCanvas:', err);
         if (statusEl) {
-            statusEl.textContent = 'Gagal membuat kolase.';
+            statusEl.textContent = `Gagal membuat kolase: ${err.message || err}`;
             statusEl.hidden = false;
         }
         tampilkanToast('Gagal memproses gambar.');
@@ -715,7 +774,7 @@ function hitungRects(layout, W, H, gap, pad, slots, count) {
         case 'grid-col': {
             const ch = (inner_h - gap * 2) / 3;
             for (let r = 0; r < 3; r++) {
-                rects.push({ x: pad, y: pad, w: inner_w, h: ch });
+                rects.push({ x: pad, y: pad + r * (ch + gap), w: inner_w, h: ch });
             }
             break;
         }
@@ -738,31 +797,51 @@ function hitungRects(layout, W, H, gap, pad, slots, count) {
     return rects;
 }
 
-function coverFit(imgW, imgH, boxW, boxH, zoom = 1, offsetX = 0, offsetY = 0) {
-    const scaleX = boxW / imgW;
-    const scaleY = boxH / imgH;
-    const baseScale = Math.max(scaleX, scaleY);
-    const totalScale = baseScale * (zoom || 1);
+function drawSlotImage(ctx, img, imgW, imgH, boxX, boxY, boxW, boxH, zoom = 1, offsetX = 0, offsetY = 0) {
+    imgW = Math.max(1, imgW || 1);
+    imgH = Math.max(1, imgH || 1);
+    boxW = Math.max(1, boxW || 1);
+    boxH = Math.max(1, boxH || 1);
+    const z = Math.max(0.1, zoom || 1);
+
+    const baseScale = Math.max(boxW / imgW, boxH / imgH);
+    const totalScale = baseScale * z;
 
     const scaledW = imgW * totalScale;
     const scaledH = imgH * totalScale;
 
-    // Pan shift in canvas coordinate system
-    const maxShiftX = Math.max(0, (scaledW - boxW) / 2);
-    const maxShiftY = Math.max(0, (scaledH - boxH) / 2);
+    if (z >= 1.0) {
+        const maxShiftX = (scaledW - boxW) / 2;
+        const maxShiftY = (scaledH - boxH) / 2;
 
-    const shiftX = ((offsetX || 0) / 100) * (maxShiftX + boxW * 0.5);
-    const shiftY = ((offsetY || 0) / 100) * (maxShiftY + boxH * 0.5);
+        const shiftX = ((offsetX || 0) / 100) * maxShiftX;
+        const shiftY = ((offsetY || 0) / 100) * maxShiftY;
 
-    const cropLeft = (scaledW - boxW) / 2 - shiftX;
-    const cropTop = (scaledH - boxH) / 2 - shiftY;
+        let sw = boxW / totalScale;
+        let sh = boxH / totalScale;
 
-    const sx = Math.max(0, Math.min(imgW - 10, cropLeft / totalScale));
-    const sy = Math.max(0, Math.min(imgH - 10, cropTop / totalScale));
-    const sw = Math.min(imgW - sx, boxW / totalScale);
-    const sh = Math.min(imgH - sy, boxH / totalScale);
+        let sx = (scaledW - boxW) / 2 / totalScale - shiftX / totalScale;
+        let sy = (scaledH - boxH) / 2 / totalScale - shiftY / totalScale;
 
-    return { sx, sy, sw, sh };
+        sx = Math.max(0, Math.min(imgW - sw, sx));
+        sy = Math.max(0, Math.min(imgH - sh, sy));
+
+        sw = Math.max(1, Math.min(imgW - sx, sw));
+        sh = Math.max(1, Math.min(imgH - sy, sh));
+
+        ctx.drawImage(img, sx, sy, sw, sh, boxX, boxY, boxW, boxH);
+    } else {
+        const maxShiftX = (boxW - scaledW) / 2;
+        const maxShiftY = (boxH - scaledH) / 2;
+
+        const shiftX = ((offsetX || 0) / 100) * (maxShiftX + boxW * 0.4);
+        const shiftY = ((offsetY || 0) / 100) * (maxShiftY + boxH * 0.4);
+
+        const dx = boxX + (boxW - scaledW) / 2 + shiftX;
+        const dy = boxY + (boxH - scaledH) / 2 + shiftY;
+
+        ctx.drawImage(img, 0, 0, imgW, imgH, dx, dy, scaledW, scaledH);
+    }
 }
 
 function bulatKanvas(ctx, x, y, w, h, r) {

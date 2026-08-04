@@ -137,6 +137,29 @@
     font-weight: 700;
 }
 
+.start-menu-search {
+    margin-bottom: 10px;
+}
+
+.start-menu-search input {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f172a;
+    outline: none;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.start-menu-search input:focus {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
 .start-menu-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));

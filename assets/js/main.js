@@ -13,10 +13,13 @@ import { initCollage } from './tools/collage.js';
 
 window.TOTOOLS_MODULE_BOOTED = true;
 
-function perbaruiJamDesktop() {
+function perbaruiWaktuDanSalam() {
     const elemenJam = document.getElementById('jam-desktop');
     const elemenJamMobile = document.getElementById('jam-mobile');
+    const elemenSalam = document.getElementById('salam-waktu');
+    const elemenTanggal = document.getElementById('tanggal-desktop');
     const sekarang = new Date();
+
     const jam = sekarang.toLocaleTimeString('id-ID', {
         hour: '2-digit',
         minute: '2-digit'
@@ -29,6 +32,65 @@ function perbaruiJamDesktop() {
     if (elemenJamMobile) {
         elemenJamMobile.textContent = jam;
     }
+
+    const jamAngka = sekarang.getHours();
+    let salam = 'Selamat Datang 👋';
+    if (jamAngka >= 3 && jamAngka < 11) {
+        salam = 'Selamat Pagi ☀️';
+    } else if (jamAngka >= 11 && jamAngka < 15) {
+        salam = 'Selamat Siang 🌤️';
+    } else if (jamAngka >= 15 && jamAngka < 18) {
+        salam = 'Selamat Sore 🌅';
+    } else {
+        salam = 'Selamat Malam 🌙';
+    }
+
+    if (elemenSalam) {
+        elemenSalam.textContent = salam;
+    }
+
+    if (elemenTanggal) {
+        const opsiTanggal = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        elemenTanggal.textContent = sekarang.toLocaleDateString('id-ID', opsiTanggal);
+    }
+}
+
+function initSearchFilter() {
+    const desktopSearch = document.getElementById('tool-search-input');
+    const startSearch = document.getElementById('start-search-input');
+
+    function filterTools(query) {
+        const q = query.toLowerCase().trim();
+        const cards = document.querySelectorAll('.shortcut-area .tool-card');
+        const startButtons = document.querySelectorAll('.start-menu-grid button');
+
+        cards.forEach((card) => {
+            const title = card.querySelector('.tool-title')?.textContent.toLowerCase() || '';
+            const desc = card.querySelector('.tool-desc')?.textContent.toLowerCase() || '';
+            const isMatch = !q || title.includes(q) || desc.includes(q);
+            card.style.display = isMatch ? '' : 'none';
+        });
+
+        startButtons.forEach((btn) => {
+            const text = btn.textContent.toLowerCase();
+            const isMatch = !q || text.includes(q);
+            btn.style.display = isMatch ? '' : 'none';
+        });
+    }
+
+    if (desktopSearch) {
+        desktopSearch.addEventListener('input', (e) => filterTools(e.target.value));
+    }
+    if (startSearch) {
+        startSearch.addEventListener('input', (e) => filterTools(e.target.value));
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            desktopSearch?.focus();
+        }
+    });
 }
 
 function initCoreEvents() {
@@ -36,6 +98,7 @@ function initCoreEvents() {
     bindShortcutDrag();
     bindDockSettings();
     initModalShortcuts();
+    initSearchFilter();
 
     document.querySelectorAll('[data-action="close-modal"]').forEach((elemen) => {
         elemen.addEventListener('click', tutupModal);
@@ -79,6 +142,11 @@ function toggleStartMenu() {
 
     const aktif = startMenu.classList.toggle('aktif');
     startMenu.setAttribute('aria-hidden', String(!aktif));
+
+    if (aktif) {
+        const startSearchInput = document.getElementById('start-search-input');
+        setTimeout(() => startSearchInput?.focus(), 50);
+    }
 }
 
 document.addEventListener('click', (event) => {
@@ -107,7 +175,7 @@ window.addEventListener('totools:tool-opened', () => {
 });
 
 function initApp() {
-    perbaruiJamDesktop();
+    perbaruiWaktuDanSalam();
     terapkanTema();
     renderTools(getDockTools());
     renderModalChrome();
@@ -120,7 +188,7 @@ function initApp() {
     initQrCode();
     initWordCounter();
     initCollage();
-    setInterval(perbaruiJamDesktop, 30000);
+    setInterval(perbaruiWaktuDanSalam, 10000);
 }
 
 initApp();

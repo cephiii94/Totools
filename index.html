@@ -6,7 +6,16 @@
     <meta name="description" content="Totools adalah kumpulan tools ringan untuk konversi mata uang, penerjemah teks, dan kebutuhan produktivitas harian.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Cpath d='M18 20h28M18 32h18M18 44h24' stroke='%23fff' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
     <title>Totools - Desktop Tools</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/core/base.css">
+    <link rel="stylesheet" href="assets/css/core/desktop.css">
+    <link rel="stylesheet" href="assets/css/core/taskbar.css">
+    <link rel="stylesheet" href="assets/css/core/modal.css">
+    <link rel="stylesheet" href="assets/css/tools/translate.css">
+    <link rel="stylesheet" href="assets/css/tools/barcode.css">
+    <link rel="stylesheet" href="assets/css/tools/qrcode.css">
+    <link rel="stylesheet" href="assets/css/tools/settings.css">
+    <link rel="stylesheet" href="assets/css/tools/wordcounter.css">
+    <link rel="stylesheet" href="assets/css/tools/collage.css">
 </head>
 <body>
     <main class="desktop">
@@ -19,10 +28,20 @@
             </span>
         </div>
 
+        <div class="desktop-search-bar" aria-label="Cari tools">
+            <svg class="search-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+            </svg>
+            <input type="search" id="tool-search-input" placeholder="Cari tool produktivitas..." aria-label="Cari alat produktivitas">
+            <span class="search-shortcut-hint">Ctrl + K</span>
+        </div>
+
         <section class="desktop-info" aria-label="Catatan Totools">
             <div class="desktop-note">
-                <span class="note-label">Totools</span>
-                <span>Tools ringan siap pakai.</span>
+                <div class="note-greeting-wrap">
+                    <span class="note-label" id="salam-waktu">Selamat Datang 👋</span>
+                    <span class="note-date" id="tanggal-desktop">Totools Workspace</span>
+                </div>
             </div>
         </section>
 
@@ -32,6 +51,7 @@
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M7 7h9.5a3.5 3.5 0 0 1 0 7H7V4m0 10h11M7 18h10" />
                     </svg>
+                    <span class="shortcut-badge" aria-hidden="true">1</span>
                 </span>
                 <span class="tool-title">Currency</span>
                 <span class="tool-desc">Konversi mata uang</span>
@@ -42,6 +62,7 @@
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M4 5h9M9 3v2m2 0c-.7 3.6-2.8 6.5-6 8m2.5-5c.8 1.7 2.1 3 3.9 4M14 19l3.5-8 3.5 8m-5.6-3h4.2" />
                     </svg>
+                    <span class="shortcut-badge" aria-hidden="true">2</span>
                 </span>
                 <span class="tool-title">Translate</span>
                 <span class="tool-desc">Penerjemah teks</span>
@@ -52,6 +73,7 @@
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M4 7V5h2M18 5h2v2M20 17v2h-2M6 19H4v-2M7 8v8M10 8v8M14 8v8M17 8v8" />
                     </svg>
+                    <span class="shortcut-badge" aria-hidden="true">3</span>
                 </span>
                 <span class="tool-title">Barcode</span>
                 <span class="tool-desc">Buat barcode</span>
@@ -62,6 +84,7 @@
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm11 1h2v2h-2v-2Zm3 3h2v2h-2v-2Zm-4 0h2v2h-2v-2Zm4-4h2v2h-2v-2Z" />
                     </svg>
+                    <span class="shortcut-badge" aria-hidden="true">4</span>
                 </span>
                 <span class="tool-title">QR Code</span>
                 <span class="tool-desc">Buat QR Code</span>
@@ -72,6 +95,7 @@
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-5v2m0 14v2m8.7-13-1.7 1M5 17l-1.7 1M21 12h-2M5 12H3m15.7 6.7-1.7-1M5 7 3.3 5.3" />
                     </svg>
+                    <span class="shortcut-badge" aria-hidden="true">5</span>
                 </span>
                 <span class="tool-title">Settings</span>
                 <span class="tool-desc">Atur tampilan</span>
@@ -82,6 +106,7 @@
                     <svg viewBox="0 0 24 24" focusable="false">
                         <path d="M5 5h14M5 9h14M5 13h9M5 17h6" />
                     </svg>
+                    <span class="shortcut-badge" aria-hidden="true">6</span>
                 </span>
                 <span class="tool-title">Word Count</span>
                 <span class="tool-desc">Hitung kata</span>
@@ -89,9 +114,13 @@
         </section>
 
         <section class="desktop-widget" aria-label="Catatan proyek">
-            <p class="eyebrow">Status</p>
-            <h2>Vanilla mode</h2>
-            <p>CSS dan JS sudah dipisah. Siap ditambah tool baru tanpa framework.</p>
+            <p class="eyebrow">Totools Workspace</p>
+            <h2>Kumpulan Tools Harian</h2>
+            <p>Konversi mata uang, penerjemah bahasa, generator QR & Barcode, hingga kolase foto dalam satu tempat tanpa ribet.</p>
+            <div class="widget-badge-row">
+                <span class="widget-pill">⚡ Siap Pakai</span>
+                <span class="widget-pill">🚀 Cepat & Ringan</span>
+            </div>
             <div class="widget-footer">
                 <span>Powered by <a href="https://brichdigital.my.id" target="_blank" rel="noopener noreferrer">Brich Digital</a></span>
                 <span class="widget-domain">brichdigital.my.id</span>
@@ -117,9 +146,12 @@
             <div class="start-menu-head">
                 <span class="start-mark">T</span>
                 <div>
-                    <strong>Totools</strong>
-                    <p>Quick launcher</p>
+                    <strong>Totools Launcher</strong>
+                    <p>Quick launcher tools</p>
                 </div>
+            </div>
+            <div class="start-menu-search">
+                <input type="search" id="start-search-input" placeholder="Ketik untuk memfilter tool..." aria-label="Filter tool di Start Menu">
             </div>
             <div class="start-menu-grid" data-render="start-menu"></div>
         </section>
@@ -507,7 +539,7 @@ TOTOOLS-2026
                     <div class="collage-adjust-grid">
                         <div class="field-group collage-field-inline">
                             <label for="collage-zoom">Zoom (<span id="collage-zoom-val">1.0x</span>)</label>
-                            <input type="range" id="collage-zoom" min="1" max="3" step="0.05" value="1">
+                            <input type="range" id="collage-zoom" min="0.2" max="3" step="0.05" value="1">
                         </div>
                         <div class="field-group collage-field-inline">
                             <label for="collage-offset-x">Geser X</label>

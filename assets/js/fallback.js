@@ -43,6 +43,13 @@
             labelAkses: 'Buka word counter',
             ikonClass: 'word',
             ikonPath: 'M5 5h14M5 9h14M5 13h9M5 17h6'
+        },
+        {
+            id: 'collage',
+            nama: 'Collage',
+            labelAkses: 'Buka image collage',
+            ikonClass: 'collage',
+            ikonPath: 'M3 3h8v8H3V3Zm0 10h8v8H3v-8Zm10-10h8v8h-8V3Zm0 10h4v4h-4v-4Zm4 4h4v4h-4v-4Zm-4 4h4v4h-4v-4Z'
         }
     ];
     var dockTools = bacaDockToolsFallback();
@@ -690,6 +697,760 @@
         buatBarcodeFallback(false);
         buatQrFallback(false);
         hitungKataFallback();
+        initCollageFallback();
+    }
+
+    var collageGambar = [];
+    var collageLayout = 'grid-2x2';
+    var collageBg = '#1a1a2e';
+    var collageGap = 8;
+    var collageRadius = 0;
+    var collageSlotSelected = null;
+
+    var COLLAGE_LAYOUTS = {
+        'grid-2x2': { cols: 2, rows: 2, slots: 4 },
+        'grid-3x3': { cols: 3, rows: 3, slots: 9 },
+        'grid-1+2': { cols: 1, rows: 1, slots: 3 },
+        'grid-2+1': { cols: 1, rows: 1, slots: 3 },
+        'grid-row': { cols: 3, rows: 1, slots: 3 },
+        'grid-col': { cols: 1, rows: 3, slots: 3 },
+        'grid-1x2': { cols: 1, rows: 1, slots: 2 },
+        'grid-2x1': { cols: 1, rows: 1, slots: 2 }
+    };
+
+    function initCollageFallback() {
+        var btnUpload = document.getElementById('collage-upload-btn');
+        var inputFile = document.getElementById('collage-file-input');
+        var dropzone = document.getElementById('collage-dropzone');
+        var btnGenerate = document.getElementById('collage-generate-btn');
+        var btnDownload = document.getElementById('collage-download-btn');
+        var btnReset = document.getElementById('collage-reset-btn');
+        var selectLayout = document.getElementById('collage-layout');
+        var inputBg = document.getElementById('collage-bg-color');
+        var inputJarak = document.getElementById('collage-gap');
+        var inputSudut = document.getElementById('collage-radius');
+        var rangeJarak = document.getElementById('collage-gap-range');
+        var rangeSudut = document.getElementById('collage-radius-range');
+        var inputZoom = document.getElementById('collage-zoom');
+        var inputOffsetX = document.getElementById('collage-offset-x');
+        var inputOffsetY = document.getElementById('collage-offset-y');
+        var btnResetAdjust = document.getElementById('collage-adjust-reset');
+
+        if (!btnUpload || btnUpload.dataset.boundCollageFallback === 'true') return;
+        btnUpload.dataset.boundCollageFallback = 'true';
+
+        btnUpload.addEventListener('click', function () { inputFile?.click(); });
+        inputFile?.addEventListener('change', function (e) {
+            tambahGambarCollageFallback(Array.from(e.target.files));
+            e.target.value = '';
+        });
+
+        dropzone?.addEventListener('dragover', function (e) { e.preventDefault(); dropzone.classList.add('drag-over'); });
+        dropzone?.addEventListener('dragleave', function () { dropzone.classList.remove('drag-over'); });
+        dropzone?.addEventListener('drop', function (e) {
+            e.preventDefault();
+            dropzone.classList.remove('drag-over');
+            var files = Array.from(e.dataTransfer.files).filter(function (f) { return f.type.startsWith('image/'); });
+            tambahGambarCollageFallback(files);
+        });
+        dropzone?.addEventListener('click', function (e) {
+            if (e.target.closest('#collage-upload-btn')) return;
+            inputFile?.click();
+        });
+
+        document.querySelectorAll('.collage-preset-color').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var color = btn.dataset.color;
+                if (inputBg) {
+                    inputBg.value = color;
+                    collageBg = color;
+                    renderPreviewCollageFallback();
+                }
+            });
+        });
+
+        selectLayout?.addEventListener('change', function (e) {
+            collageLayout = e.target.value;
+            collageSlotSelected = null;
+            renderPreviewCollageFallback();
+        });
+
+        inputBg?.addEventListener('input', function (e) {
+            collageBg = e.target.value;
+            renderPreviewCollageFallback();
+        });
+
+        if (rangeJarak && inputJarak) {
+            rangeJarak.addEventListener('input', function (e) {
+                collageGap = parseInt(e.target.value, 10);
+                inputJarak.value = collageGap;
+                renderPreviewCollageFallback();
+            });
+            inputJarak.addEventListener('input', function (e) {
+                collageGap = Math.max(0, Math.min(40, parseInt(e.target.value, 10) || 0));
+                rangeJarak.value = collageGap;
+                renderPreviewCollageFallback();
+            });
+        }
+
+        if (rangeSudut && inputSudut) {
+            rangeSudut.addEventListener('input', function (e) {
+                collageRadius = parseInt(e.target.value, 10);
+                inputSudut.value = collageRadius;
+                renderPreviewCollageFallback();
+            });
+            inputSudut.addEventListener('input', function (e) {
+                collageRadius = Math.max(0, Math.min(40, parseInt(e.target.value, 10) || 0));
+                rangeSudut.value = collageRadius;
+                renderPreviewCollageFallback();
+            });
+        }
+
+        inputZoom?.addEventListener('input', function (e) {
+            if (collageSlotSelected === null || !collageGambar[collageSlotSelected]) return;
+            var val = parseFloat(e.target.value);
+            collageGambar[collageSlotSelected].zoom = val;
+            var lbl = document.getElementById('collage-zoom-val');
+            if (lbl) lbl.textContent = val.toFixed(2) + 'x';
+            updateSlotTransformCollageFallback(collageSlotSelected);
+        });
+
+        inputOffsetX?.addEventListener('input', function (e) {
+            if (collageSlotSelected === null || !collageGambar[collageSlotSelected]) return;
+            collageGambar[collageSlotSelected].offsetX = parseInt(e.target.value, 10);
+            updateSlotTransformCollageFallback(collageSlotSelected);
+        });
+
+        inputOffsetY?.addEventListener('input', function (e) {
+            if (collageSlotSelected === null || !collageGambar[collageSlotSelected]) return;
+            collageGambar[collageSlotSelected].offsetY = parseInt(e.target.value, 10);
+            updateSlotTransformCollageFallback(collageSlotSelected);
+        });
+
+        btnResetAdjust?.addEventListener('click', function () {
+            if (collageSlotSelected === null || !collageGambar[collageSlotSelected]) return;
+            collageGambar[collageSlotSelected].zoom = 1;
+            collageGambar[collageSlotSelected].offsetX = 0;
+            collageGambar[collageSlotSelected].offsetY = 0;
+            syncAdjustPanelValuesCollageFallback();
+            updateSlotTransformCollageFallback(collageSlotSelected);
+            tampilkanToastFallback('Posisi gambar #' + (collageSlotSelected + 1) + ' direset.');
+        });
+
+        btnGenerate?.addEventListener('click', function () {
+            if (collageGambar.length === 0) {
+                tampilkanToastFallback('Upload minimal 1 gambar dulu!');
+                return;
+            }
+            buatKolaseCanvasFallback();
+        });
+
+        btnDownload?.addEventListener('click', function () {
+            var canvas = document.getElementById('collage-canvas');
+            if (!canvas || canvas.dataset.hasContent !== 'true') {
+                tampilkanToastFallback('Buat kolase dulu!');
+                return;
+            }
+            unduhUrlFallback(canvas.toDataURL('image/png'), 'kolase-totools-' + Date.now() + '.png');
+            tampilkanToastFallback('Kolase diunduh!');
+        });
+
+        btnReset?.addEventListener('click', function () {
+            collageGambar = [];
+            collageSlotSelected = null;
+            renderDaftarGambarCollageFallback();
+            renderPreviewCollageFallback();
+            bersihkanCanvasCollageFallback();
+            tampilkanToastFallback('Gambar direset.');
+        });
+    }
+
+    async function tambahGambarCollageFallback(files) {
+        var valid = files.filter(function (f) { return f.type.startsWith('image/'); });
+        if (valid.length === 0) {
+            tampilkanToastFallback('Hanya file gambar yang didukung.');
+            return;
+        }
+
+        var adaYangDikompres = false;
+        var ditambahkan = 0;
+
+        for (var i = 0; i < valid.length; i++) {
+            var file = valid[i];
+            if (collageGambar.length >= 9) {
+                tampilkanToastFallback('Maksimal 9 gambar per kolase.');
+                break;
+            }
+
+            try {
+                var hasil = await kompresGambarCollageFallback(file);
+                collageGambar.push({
+                    src: hasil.src,
+                    nama: hasil.nama,
+                    zoom: 1,
+                    offsetX: 0,
+                    offsetY: 0
+                });
+                if (hasil.dikompres) adaYangDikompres = true;
+                ditambahkan++;
+            } catch (err) {
+                tampilkanToastFallback(err.message || ('Gagal memproses ' + file.name));
+            }
+        }
+
+        if (ditambahkan > 0) {
+            renderDaftarGambarCollageFallback();
+            renderPreviewCollageFallback();
+            if (adaYangDikompres) {
+                tampilkanToastFallback(ditambahkan + ' gambar ditambahkan (otomatis dioptimasi).');
+            } else {
+                tampilkanToastFallback(ditambahkan + ' gambar ditambahkan.');
+            }
+        }
+    }
+
+    async function kompresGambarCollageFallback(file) {
+        if (file.size > 50 * 1024 * 1024) {
+            throw new Error('File ' + file.name + ' terlalu besar (maksimal 50MB).');
+        }
+
+        var dataUrl = await new Promise(function (resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function (e) { resolve(e.target.result); };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+
+        var img = await new Promise(function (resolve, reject) {
+            var image = new Image();
+            image.onload = function () { resolve(image); };
+            image.onerror = reject;
+            image.src = dataUrl;
+        });
+
+        var width = img.width;
+        var height = img.height;
+        if (width <= 2048 && height <= 2048 && file.size < 2 * 1024 * 1024) {
+            return { src: dataUrl, nama: file.name, dikompres: false };
+        }
+
+        var scale = 1;
+        if (width > 2048 || height > 2048) {
+            scale = Math.min(2048 / width, 2048 / height);
+        }
+
+        var newWidth = Math.round(width * scale);
+        var newHeight = Math.round(height * scale);
+
+        var canvas = document.createElement('canvas');
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+        return { src: canvas.toDataURL('image/jpeg', 0.88), nama: file.name, dikompres: true };
+    }
+
+    function renderDaftarGambarCollageFallback() {
+        var container = document.getElementById('collage-image-list');
+        if (!container) return;
+
+        if (collageGambar.length === 0) {
+            container.innerHTML = '<p class="collage-empty-list">Belum ada gambar.</p>';
+            return;
+        }
+
+        container.innerHTML = collageGambar.map(function (gambar, idx) {
+            return '<div class="collage-thumb ' + (collageSlotSelected === idx ? 'is-selected' : '') + '" draggable="true" data-idx="' + idx + '">' +
+                '<img src="' + gambar.src + '" alt="' + gambar.nama + '" loading="lazy">' +
+                '<button class="collage-thumb-remove" type="button" data-remove="' + idx + '" aria-label="Hapus gambar ' + (idx + 1) + '">×</button>' +
+                '<span class="collage-thumb-num">' + (idx + 1) + '</span>' +
+            '</div>';
+        }).join('');
+
+        container.querySelectorAll('.collage-thumb').forEach(function (thumb) {
+            thumb.addEventListener('click', function () {
+                var idx = parseInt(thumb.dataset.idx, 10);
+                pilihSlotCollageFallback(idx);
+            });
+        });
+
+        container.querySelectorAll('[data-remove]').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var idx = parseInt(btn.dataset.remove, 10);
+                collageGambar.splice(idx, 1);
+                if (collageSlotSelected === idx) collageSlotSelected = null;
+                else if (collageSlotSelected > idx) collageSlotSelected--;
+                renderDaftarGambarCollageFallback();
+                renderPreviewCollageFallback();
+            });
+        });
+    }
+
+    function renderPreviewCollageFallback() {
+        var wrapper = document.getElementById('collage-preview-wrapper');
+        if (!wrapper) return;
+
+        if (collageGambar.length === 0) {
+            wrapper.innerHTML = '<p class="collage-preview-empty">Preview kolase akan tampil di sini setelah gambar diupload.</p>';
+            sebunyikanAdjustPanelCollageFallback();
+            return;
+        }
+
+        var layout = COLLAGE_LAYOUTS[collageLayout] || COLLAGE_LAYOUTS['grid-2x2'];
+        var slots = layout.slots;
+        var imgsToUse = collageGambar.slice(0, slots);
+
+        var gridStyle = '';
+        var gridClass = 'collage-preview-grid layout-' + collageLayout;
+
+        switch (collageLayout) {
+            case 'grid-2x2': gridStyle = 'grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr);'; break;
+            case 'grid-3x3': gridStyle = 'grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);'; break;
+            case 'grid-1+2': gridStyle = 'grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr;'; break;
+            case 'grid-2+1': gridStyle = 'grid-template-columns: 1fr 2fr; grid-template-rows: 1fr 1fr;'; break;
+            case 'grid-row': gridStyle = 'grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr;'; break;
+            case 'grid-col': gridStyle = 'grid-template-columns: 1fr; grid-template-rows: repeat(3, 1fr);'; break;
+            case 'grid-1x2': gridStyle = 'grid-template-columns: repeat(2, 1fr); grid-template-rows: 1fr;'; break;
+            case 'grid-2x1': gridStyle = 'grid-template-columns: 1fr; grid-template-rows: repeat(2, 1fr);'; break;
+        }
+
+        var items = imgsToUse.map(function (gambar, idx) {
+            var itemStyle = '';
+            if (collageLayout === 'grid-1+2' && idx === 0) itemStyle = 'grid-row: 1 / 3;';
+            if (collageLayout === 'grid-2+1' && idx === 2) itemStyle = 'grid-column: 2; grid-row: 1 / 3;';
+
+            var isSelected = collageSlotSelected === idx;
+            var zoom = gambar.zoom || 1;
+            var offX = gambar.offsetX || 0;
+            var offY = gambar.offsetY || 0;
+
+            return '<div class="collage-slot ' + (isSelected ? 'is-selected' : '') + '" data-slot-idx="' + idx + '" style="' + itemStyle + ' border-radius: ' + collageRadius + 'px;">' +
+                '<img src="' + gambar.src + '" alt="' + gambar.nama + '" style="border-radius:' + collageRadius + 'px; transform: scale(' + zoom + ') translate(' + (offX / zoom) + '%, ' + (offY / zoom) + '%); transform-origin: center center;">' +
+            '</div>';
+        }).join('');
+
+        var missing = Math.max(0, slots - imgsToUse.length);
+        var placeholders = Array.from({ length: missing }, function (_, i) {
+            return '<div class="collage-slot collage-slot-empty" style="border-radius:' + collageRadius + 'px;"><span>' + (imgsToUse.length + i + 1) + '</span></div>';
+        }).join('');
+
+        wrapper.innerHTML = '<div class="' + gridClass + '" style="' + gridStyle + ' gap: ' + collageGap + 'px; background: ' + collageBg + '; padding: ' + collageGap + 'px; border-radius: ' + Math.max(0, collageRadius + 4) + 'px;">' + items + placeholders + '</div>';
+
+        bindSlotInteractionsCollageFallback(wrapper);
+
+        if (collageSlotSelected !== null && collageSlotSelected < imgsToUse.length) {
+            tampilkanAdjustPanelCollageFallback();
+        } else {
+            sebunyikanAdjustPanelCollageFallback();
+        }
+    }
+
+    function bindSlotInteractionsCollageFallback(wrapper) {
+        wrapper.querySelectorAll('.collage-slot[data-slot-idx]').forEach(function (slotEl) {
+            var idx = parseInt(slotEl.dataset.slotIdx, 10);
+            var isPointerDown = false;
+            var startX = 0;
+            var startY = 0;
+            var initOffX = 0;
+            var initOffY = 0;
+
+            slotEl.addEventListener('pointerdown', function (e) {
+                isPointerDown = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                var g = collageGambar[idx];
+                initOffX = g ? (g.offsetX || 0) : 0;
+                initOffY = g ? (g.offsetY || 0) : 0;
+                try { slotEl.setPointerCapture(e.pointerId); } catch (err) {}
+                pilihSlotCollageFallback(idx);
+            });
+
+            slotEl.addEventListener('pointermove', function (e) {
+                if (!isPointerDown) return;
+                var g = collageGambar[idx];
+                if (!g) return;
+
+                var rect = slotEl.getBoundingClientRect();
+                var deltaX = e.clientX - startX;
+                var deltaY = e.clientY - startY;
+
+                var percentX = (deltaX / rect.width) * 100;
+                var percentY = (deltaY / rect.height) * 100;
+
+                var zoom = g.zoom || 1;
+                g.offsetX = Math.max(-100, Math.min(100, Math.round(initOffX + percentX * zoom)));
+                g.offsetY = Math.max(-100, Math.min(100, Math.round(initOffY + percentY * zoom)));
+
+                updateSlotTransformCollageFallback(idx);
+                syncAdjustPanelValuesCollageFallback();
+            });
+
+            var stopPointer = function (e) {
+                if (isPointerDown) {
+                    isPointerDown = false;
+                    try { slotEl.releasePointerCapture(e.pointerId); } catch (err) {}
+                }
+            };
+
+            slotEl.addEventListener('pointerup', stopPointer);
+            slotEl.addEventListener('pointercancel', stopPointer);
+
+            slotEl.addEventListener('wheel', function (e) {
+                e.preventDefault();
+                var g = collageGambar[idx];
+                if (!g) return;
+
+                pilihSlotCollageFallback(idx);
+
+                var currentZoom = g.zoom || 1;
+                var delta = e.deltaY < 0 ? 0.08 : -0.08;
+                var newZoom = Math.max(0.2, Math.min(3, Math.round((currentZoom + delta) * 100) / 100));
+
+                g.zoom = newZoom;
+                updateSlotTransformCollageFallback(idx);
+                syncAdjustPanelValuesCollageFallback();
+            }, { passive: false });
+
+            var initialTouchDist = 0;
+            var initialTouchZoom = 1;
+
+            slotEl.addEventListener('touchstart', function (e) {
+                if (e.touches.length === 2) {
+                    isPointerDown = false;
+                    var g = collageGambar[idx];
+                    if (!g) return;
+                    pilihSlotCollageFallback(idx);
+                    initialTouchZoom = g.zoom || 1;
+                    var dx = e.touches[0].clientX - e.touches[1].clientX;
+                    var dy = e.touches[0].clientY - e.touches[1].clientY;
+                    initialTouchDist = Math.hypot(dx, dy);
+                }
+            }, { passive: true });
+
+            slotEl.addEventListener('touchmove', function (e) {
+                if (e.touches.length === 2 && initialTouchDist > 0) {
+                    e.preventDefault();
+                    var g = collageGambar[idx];
+                    if (!g) return;
+
+                    var dx = e.touches[0].clientX - e.touches[1].clientX;
+                    var dy = e.touches[0].clientY - e.touches[1].clientY;
+                    var currentDist = Math.hypot(dx, dy);
+
+                    if (currentDist > 0) {
+                        var scaleFactor = currentDist / initialTouchDist;
+                        var newZoom = Math.max(0.2, Math.min(3, Math.round(initialTouchZoom * scaleFactor * 100) / 100));
+                        g.zoom = newZoom;
+                        updateSlotTransformCollageFallback(idx);
+                        syncAdjustPanelValuesCollageFallback();
+                    }
+                }
+            }, { passive: false });
+
+            slotEl.addEventListener('touchend', function (e) {
+                if (e.touches.length < 2) {
+                    initialTouchDist = 0;
+                }
+            });
+
+            slotEl.addEventListener('dblclick', function () {
+                var g = collageGambar[idx];
+                if (!g) return;
+                g.zoom = 1;
+                g.offsetX = 0;
+                g.offsetY = 0;
+                updateSlotTransformCollageFallback(idx);
+                tampilkanToastFallback('Posisi gambar #' + (idx + 1) + ' direset.');
+            });
+        });
+    }
+
+    function pilihSlotCollageFallback(idx) {
+        if (idx < 0 || idx >= collageGambar.length) return;
+        collageSlotSelected = idx;
+
+        document.querySelectorAll('.collage-slot[data-slot-idx]').forEach(function (el) {
+            var slotIdx = parseInt(el.dataset.slotIdx, 10);
+            el.classList.toggle('is-selected', slotIdx === idx);
+        });
+
+        document.querySelectorAll('.collage-thumb').forEach(function (thumb) {
+            var thumbIdx = parseInt(thumb.dataset.idx, 10);
+            thumb.classList.toggle('is-selected', thumbIdx === idx);
+        });
+
+        tampilkanAdjustPanelCollageFallback();
+    }
+
+    function updateSlotTransformCollageFallback(idx) {
+        var slotEl = document.querySelector('.collage-slot[data-slot-idx="' + idx + '"]');
+        var imgEl = slotEl?.querySelector('img');
+        var g = collageGambar[idx];
+        if (!imgEl || !g) return;
+
+        var zoom = g.zoom || 1;
+        var offX = g.offsetX || 0;
+        var offY = g.offsetY || 0;
+        imgEl.style.transform = 'scale(' + zoom + ') translate(' + (offX / zoom) + '%, ' + (offY / zoom) + '%)';
+    }
+
+    function tampilkanAdjustPanelCollageFallback() {
+        var panel = document.getElementById('collage-adjust-panel');
+        var title = document.getElementById('collage-adjust-title');
+        if (!panel || collageSlotSelected === null || !collageGambar[collageSlotSelected]) return;
+
+        panel.hidden = false;
+        if (title) title.textContent = 'Atur Gambar #' + (collageSlotSelected + 1);
+        syncAdjustPanelValuesCollageFallback();
+    }
+
+    function sebunyikanAdjustPanelCollageFallback() {
+        var panel = document.getElementById('collage-adjust-panel');
+        if (panel) panel.hidden = true;
+    }
+
+    function syncAdjustPanelValuesCollageFallback() {
+        if (collageSlotSelected === null || !collageGambar[collageSlotSelected]) return;
+        var g = collageGambar[collageSlotSelected];
+        var zoom = g.zoom || 1;
+        var offX = g.offsetX || 0;
+        var offY = g.offsetY || 0;
+
+        var inputZoom = document.getElementById('collage-zoom');
+        var inputOffsetX = document.getElementById('collage-offset-x');
+        var inputOffsetY = document.getElementById('collage-offset-y');
+        var labelZoom = document.getElementById('collage-zoom-val');
+
+        if (inputZoom) inputZoom.value = zoom;
+        if (inputOffsetX) inputOffsetX.value = offX;
+        if (inputOffsetY) inputOffsetY.value = offY;
+        if (labelZoom) labelZoom.textContent = zoom.toFixed(2) + 'x';
+    }
+
+    function bersihkanCanvasCollageFallback() {
+        var canvas = document.getElementById('collage-canvas');
+        var status = document.getElementById('collage-canvas-status');
+        if (canvas) {
+            var ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.dataset.hasContent = 'false';
+            canvas.style.display = 'none';
+        }
+        if (status) {
+            status.textContent = '';
+            status.hidden = true;
+        }
+    }
+
+    async function buatKolaseCanvasFallback() {
+        var canvas = document.getElementById('collage-canvas');
+        var statusEl = document.getElementById('collage-canvas-status');
+        if (!canvas) return;
+
+        var layout = COLLAGE_LAYOUTS[collageLayout] || COLLAGE_LAYOUTS['grid-2x2'];
+        var slots = layout.slots;
+        var imgsToUse = collageGambar.slice(0, slots);
+
+        if (statusEl) {
+            statusEl.textContent = 'Memproses...';
+            statusEl.hidden = false;
+        }
+
+        try {
+            var loadedImgs = await Promise.all(imgsToUse.map(function (g) {
+                return new Promise(function (resolve, reject) {
+                    var img = new Image();
+                    img.onload = function () { resolve(img); };
+                    img.onerror = reject;
+                    img.src = g.src;
+                });
+            }));
+
+            var CANVAS_W = 1200;
+            var CANVAS_H = 1200;
+            var GAP = collageGap * 3;
+            var PADDING = collageGap * 3;
+            var RADIUS = collageRadius * 2;
+
+            canvas.width = CANVAS_W;
+            canvas.height = CANVAS_H;
+            var ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = collageBg;
+            ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+            var rects = hitungRectsCollageFallback(collageLayout, CANVAS_W, CANVAS_H, GAP, PADDING, slots);
+
+            loadedImgs.forEach(function (img, i) {
+                if (!rects[i]) return;
+                var rect = rects[i];
+                var g = imgsToUse[i];
+                var zoom = g.zoom || 1;
+                var offX = g.offsetX || 0;
+                var offY = g.offsetY || 0;
+
+                var nw = img.naturalWidth || img.width || 1;
+                var nh = img.naturalHeight || img.height || 1;
+
+                ctx.save();
+                if (RADIUS > 0) {
+                    var maxR = Math.min(rect.w, rect.h) / 2;
+                    var r = Math.min(RADIUS, maxR);
+                    ctx.beginPath();
+                    ctx.moveTo(rect.x + r, rect.y);
+                    ctx.lineTo(rect.x + rect.w - r, rect.y);
+                    ctx.arcTo(rect.x + rect.w, rect.y, rect.x + rect.w, rect.y + r, r);
+                    ctx.lineTo(rect.x + rect.w, rect.y + rect.h - r);
+                    ctx.arcTo(rect.x + rect.w, rect.y + rect.h, rect.x + rect.w - r, rect.y + rect.h, r);
+                    ctx.lineTo(rect.x + r, rect.y + rect.h);
+                    ctx.arcTo(rect.x, rect.y + rect.h, rect.x, rect.y + rect.h - r, r);
+                    ctx.lineTo(rect.x, rect.y + r);
+                    ctx.arcTo(rect.x, rect.y, rect.x + r, rect.y, r);
+                    ctx.closePath();
+                    ctx.clip();
+                }
+
+                drawSlotImageCollageFallback(ctx, img, nw, nh, rect.x, rect.y, rect.w, rect.h, zoom, offX, offY);
+                ctx.restore();
+            });
+
+            canvas.style.display = 'block';
+            canvas.dataset.hasContent = 'true';
+
+            if (statusEl) {
+                statusEl.textContent = 'Kolase siap! Tekan Download untuk menyimpan.';
+                statusEl.hidden = false;
+            }
+
+            tampilkanToastFallback('Kolase berhasil dibuat!');
+        } catch (err) {
+            console.error('Error buatKolaseCanvasFallback:', err);
+            if (statusEl) {
+                statusEl.textContent = 'Gagal membuat kolase: ' + (err.message || err);
+                statusEl.hidden = false;
+            }
+            tampilkanToastFallback('Gagal memproses gambar.');
+        }
+    }
+
+    function hitungRectsCollageFallback(layout, W, H, gap, pad, slots) {
+        var inner_w = W - pad * 2;
+        var inner_h = H - pad * 2;
+        var rects = [];
+
+        switch (layout) {
+            case 'grid-2x2': {
+                var cw = (inner_w - gap) / 2;
+                var ch = (inner_h - gap) / 2;
+                for (var r = 0; r < 2; r++) for (var c = 0; c < 2; c++) {
+                    rects.push({ x: pad + c * (cw + gap), y: pad + r * (ch + gap), w: cw, h: ch });
+                }
+                break;
+            }
+            case 'grid-3x3': {
+                var cw = (inner_w - gap * 2) / 3;
+                var ch = (inner_h - gap * 2) / 3;
+                for (var r = 0; r < 3; r++) for (var c = 0; c < 3; c++) {
+                    rects.push({ x: pad + c * (cw + gap), y: pad + r * (ch + gap), w: cw, h: ch });
+                }
+                break;
+            }
+            case 'grid-1+2': {
+                var bigW = (inner_w - gap) * 2 / 3;
+                var smallW = inner_w - gap - bigW;
+                var ch = (inner_h - gap) / 2;
+                rects.push({ x: pad, y: pad, w: bigW, h: inner_h });
+                rects.push({ x: pad + bigW + gap, y: pad, w: smallW, h: ch });
+                rects.push({ x: pad + bigW + gap, y: pad + ch + gap, w: smallW, h: ch });
+                break;
+            }
+            case 'grid-2+1': {
+                var smallW = (inner_w - gap) * 1 / 3;
+                var bigW = inner_w - gap - smallW;
+                var ch = (inner_h - gap) / 2;
+                rects.push({ x: pad, y: pad, w: smallW, h: ch });
+                rects.push({ x: pad, y: pad + ch + gap, w: smallW, h: ch });
+                rects.push({ x: pad + smallW + gap, y: pad, w: bigW, h: inner_h });
+                break;
+            }
+            case 'grid-row': {
+                var cw = (inner_w - gap * 2) / 3;
+                for (var c = 0; c < 3; c++) {
+                    rects.push({ x: pad + c * (cw + gap), y: pad, w: cw, h: inner_h });
+                }
+                break;
+            }
+            case 'grid-col': {
+                var ch = (inner_h - gap * 2) / 3;
+                for (var r = 0; r < 3; r++) {
+                    rects.push({ x: pad, y: pad + r * (ch + gap), w: inner_w, h: ch });
+                }
+                break;
+            }
+            case 'grid-1x2': {
+                var cw = (inner_w - gap) / 2;
+                rects.push({ x: pad, y: pad, w: cw, h: inner_h });
+                rects.push({ x: pad + cw + gap, y: pad, w: cw, h: inner_h });
+                break;
+            }
+            case 'grid-2x1': {
+                var ch = (inner_h - gap) / 2;
+                rects.push({ x: pad, y: pad, w: inner_w, h: ch });
+                rects.push({ x: pad, y: pad + ch + gap, w: inner_w, h: ch });
+                break;
+            }
+        }
+        return rects;
+    }
+
+    function drawSlotImageCollageFallback(ctx, img, imgW, imgH, boxX, boxY, boxW, boxH, zoom, offsetX, offsetY) {
+        imgW = Math.max(1, imgW || 1);
+        imgH = Math.max(1, imgH || 1);
+        boxW = Math.max(1, boxW || 1);
+        boxH = Math.max(1, boxH || 1);
+        var z = Math.max(0.1, zoom || 1);
+
+        var baseScale = Math.max(boxW / imgW, boxH / imgH);
+        var totalScale = baseScale * z;
+
+        var scaledW = imgW * totalScale;
+        var scaledH = imgH * totalScale;
+
+        if (z >= 1.0) {
+            var maxShiftX = (scaledW - boxW) / 2;
+            var maxShiftY = (scaledH - boxH) / 2;
+
+            var shiftX = ((offsetX || 0) / 100) * maxShiftX;
+            var shiftY = ((offsetY || 0) / 100) * maxShiftY;
+
+            var sw = boxW / totalScale;
+            var sh = boxH / totalScale;
+
+            var sx = (scaledW - boxW) / 2 / totalScale - shiftX / totalScale;
+            var sy = (scaledH - boxH) / 2 / totalScale - shiftY / totalScale;
+
+            sx = Math.max(0, Math.min(imgW - sw, sx));
+            sy = Math.max(0, Math.min(imgH - sh, sy));
+
+            sw = Math.max(1, Math.min(imgW - sx, sw));
+            sh = Math.max(1, Math.min(imgH - sy, sh));
+
+            ctx.drawImage(img, sx, sy, sw, sh, boxX, boxY, boxW, boxH);
+        } else {
+            var maxShiftX = (boxW - scaledW) / 2;
+            var maxShiftY = (boxH - scaledH) / 2;
+
+            var shiftX = ((offsetX || 0) / 100) * (maxShiftX + boxW * 0.4);
+            var shiftY = ((offsetY || 0) / 100) * (maxShiftY + boxH * 0.4);
+
+            var dx = boxX + (boxW - scaledW) / 2 + shiftX;
+            var dy = boxY + (boxH - scaledH) / 2 + shiftY;
+
+            ctx.drawImage(img, 0, 0, imgW, imgH, dx, dy, scaledW, scaledH);
+        }
     }
 
     var kursFallback = null;
@@ -1180,7 +1941,8 @@
                 3: 'barcode',
                 4: 'qrcode',
                 5: 'settings',
-                6: 'wordcounter'
+                6: 'wordcounter',
+                7: 'collage'
             };
 
             if (pintasan[event.key]) {

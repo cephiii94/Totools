@@ -13,14 +13,27 @@ export function renderTools(dockTools) {
     const daftarTools = getDaftarTools();
     const desktopTools = bacaDesktopTools(daftarTools);
 
+    const pintasanMap = {
+        konversi: '1',
+        translate: '2',
+        barcode: '3',
+        qrcode: '4',
+        settings: '5',
+        wordcounter: '6',
+        collage: '7'
+    };
+
     if (areaTools) {
-        areaTools.innerHTML = daftarTools.filter((tool) => desktopTools.includes(tool.id)).map((tool) => `
+        areaTools.innerHTML = daftarTools.filter((tool) => desktopTools.includes(tool.id)).map((tool) => {
+            const badgeKey = pintasanMap[tool.id] ? `<span class="shortcut-badge" aria-hidden="true">${pintasanMap[tool.id]}</span>` : '';
+            return `
             <button class="tool-card" type="button" data-tool="${tool.id}">
-                <span class="tool-icon ${tool.ikonClass}" aria-hidden="true">${buatIkon(tool.ikonPath)}</span>
+                <span class="tool-icon ${tool.ikonClass}" aria-hidden="true">${buatIkon(tool.ikonPath)}${badgeKey}</span>
                 <span class="tool-title">${tool.nama}</span>
                 <span class="tool-desc">${tool.deskripsi}</span>
             </button>
-        `).join('');
+        `;
+        }).join('');
     }
 
     if (areaDock) {
