@@ -8,8 +8,11 @@
 }
 
 .desktop {
-    position: relative;
-    min-height: 100vh;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     padding: 32px 32px 86px;
     background:
