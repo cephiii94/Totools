@@ -4,6 +4,7 @@ import { DesktopShortcut } from './DesktopShortcut';
 import { Window } from '../window/Window';
 import { Dock } from '../dock/Dock';
 import { Spotlight } from './Spotlight';
+import { PWAInstallPrompt } from '../pwa/PWAInstallPrompt';
 import { Search } from 'lucide-react';
 
 import { CurrencyTool } from '../../tools/CurrencyTool';
@@ -28,6 +29,17 @@ export const Desktop = () => {
   const { toolsList, openWindows, openTool, toggleSpotlight, wallpaper, customWallpaperUrl } = useWindowContext();
   const [greeting, setGreeting] = useState('');
   const [formattedDate, setFormattedDate] = useState('');
+
+  // Dismiss Instant Splash Loading Screen smoothly on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const splash = document.getElementById('app-splash-screen');
+      if (splash) {
+        splash.classList.add('is-loaded');
+      }
+    }, 700);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const now = new Date();
@@ -125,6 +137,9 @@ export const Desktop = () => {
 
       {/* macOS Spotlight Search Modal */}
       <Spotlight />
+
+      {/* PWA Installation Prompt Banner */}
+      <PWAInstallPrompt />
     </div>
   );
 };

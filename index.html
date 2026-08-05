@@ -2,16 +2,126 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Totools - Kumpulan Tools Ringan Web OS</title>
   <meta name="description" content="Kumpulan tools produktivitas ringan berbasis Web OS: Konversi Mata Uang, Penerjemah Teks, Barcode Generator, QR Code Generator, Word Counter, dan Collage Maker." />
+  
+  <!-- PWA & Mobile Web App Meta Tags -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Totools OS" />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <!-- Script Google AdSense (Siap diaktifkan jika client memiliki Client ID) -->
-  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+  <!-- Instant Splash Screen Styles -->
+  <style>
+    #app-splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 40%, #1e293b 0%, #0f172a 60%, #020617 100%);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    #app-splash-screen.is-loaded {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      animation: splashPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .splash-logo {
+      width: 96px;
+      height: 96px;
+      filter: drop-shadow(0 16px 32px rgba(37, 99, 235, 0.45));
+      animation: logoPulse 2s ease-in-out infinite;
+    }
+
+    .splash-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin: 0;
+      background: linear-gradient(135deg, #60a5fa 0%, #ffffff 60%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .splash-subtitle {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin: -8px 0 0 0;
+    }
+
+    .splash-progress-track {
+      width: 220px;
+      height: 6px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      margin-top: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .splash-progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #38bdf8, #60a5fa);
+      border-radius: 10px;
+      animation: fillProgress 1.1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes fillProgress {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 16px 32px rgba(37, 99, 235, 0.45)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 20px 40px rgba(56, 189, 248, 0.65)); }
+    }
+
+    @keyframes splashPop {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
 </head>
 <body>
+  <!-- Instant App Splash Screen -->
+  <div id="app-splash-screen">
+    <div class="splash-card">
+      <img src="/favicon.svg" alt="Totools OS Logo" class="splash-logo" />
+      <h1 class="splash-title">Totools OS</h1>
+      <p class="splash-subtitle">Memuat Web OS & Alat Produktivitas...</p>
+      <div class="splash-progress-track">
+        <div class="splash-progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

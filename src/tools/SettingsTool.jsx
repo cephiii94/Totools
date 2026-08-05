@@ -1,10 +1,16 @@
 import React, { useState } from 'react';
 import { useWindowContext } from '../context/WindowContext';
-import { Palette, Image as ImageIcon, Info, Link as LinkIcon, Upload, Check, Trash2, Sparkles, RefreshCw } from 'lucide-react';
+import { Palette, Image as ImageIcon, Info, Link as LinkIcon, Upload, Check, Trash2, Volume2, VolumeX, RefreshCw } from 'lucide-react';
 import { AdBanner } from '../components/ads/AdBanner';
 
 export const SettingsTool = () => {
-  const { theme, setTheme, wallpaper, setWallpaper, customWallpaperUrl, setCustomWallpaperUrl } = useWindowContext();
+  const { 
+    theme, setTheme, 
+    wallpaper, setWallpaper, 
+    customWallpaperUrl, setCustomWallpaperUrl,
+    soundEnabled, setSoundEnabled 
+  } = useWindowContext();
+
   const [activeTab, setActiveTab] = useState('gallery'); // 'gallery' | 'upload' | 'url'
   const [inputUrl, setInputUrl] = useState(customWallpaperUrl && !customWallpaperUrl.startsWith('data:') ? customWallpaperUrl : '');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -94,6 +100,26 @@ export const SettingsTool = () => {
   return (
     <div className="tool-container">
       <div className="tool-form-grid">
+        {/* Sound Effects Setting */}
+        <div className="form-group">
+          <label className="section-title">
+            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />} Efek Suara OS (Audio FX)
+          </label>
+          <div className="sound-toggle-card">
+            <div className="sound-info">
+              <div className="sound-title">Suara Antarmuka Desktop OS</div>
+              <div className="sound-desc">Mainkan efek suara halus ala macOS saat membuka, menutup, meremajakan, atau mencari alat</div>
+            </div>
+            <button
+              className={`toggle-switch ${soundEnabled ? 'is-on' : ''}`}
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              title={soundEnabled ? 'Matikan Suara OS' : 'Aktifkan Suara OS'}
+            >
+              <div className="toggle-handle" />
+            </button>
+          </div>
+        </div>
+
         {/* Theme Settings */}
         <div className="form-group">
           <label className="section-title">
@@ -242,6 +268,7 @@ export const SettingsTool = () => {
             Totools adalah kumpulan alat produktivitas ringan berbasis Web OS yang berjalan 100% di browser Anda tanpa perlu install aplikasi.
           </p>
           <div className="badge-row">
+            <span className="pill-badge">Audio FX OS</span>
             <span className="pill-badge">Auto-Resize Canvas</span>
             <span className="pill-badge">Spotlight (Ctrl+Space)</span>
             <span className="pill-badge">Vite 6</span>

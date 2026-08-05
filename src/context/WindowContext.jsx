@@ -8,6 +8,7 @@ import {
   Image as ImageIcon, 
   Settings
 } from 'lucide-react';
+import { playSound } from '../utils/audio';
 
 export const TOOLS_LIST = [
   {
@@ -84,6 +85,10 @@ export const WindowProvider = ({ children }) => {
   const [theme, setThemeState] = useState(() => localStorage.getItem('totools_theme') || 'default');
   const [wallpaper, setWallpaperState] = useState(() => localStorage.getItem('totools_wallpaper') || 'glass-blue');
   const [customWallpaperUrl, setCustomWallpaperUrlState] = useState(() => localStorage.getItem('totools_custom_wallpaper_url') || '');
+  const [soundEnabled, setSoundEnabledState] = useState(() => {
+    const saved = localStorage.getItem('totools_sound_enabled');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
   const [isStartOpen, setIsStartOpen] = useState(false);
   const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
 
@@ -97,6 +102,14 @@ export const WindowProvider = ({ children }) => {
     localStorage.setItem('totools_wallpaper', wallpaper);
   }, [wallpaper]);
 
+  const setSoundEnabled = (enabled) => {
+    setSoundEnabledState(enabled);
+    localStorage.setItem('totools_sound_enabled', JSON.stringify(enabled));
+    if (enabled) {
+      playSound('open', true);
+    }
+  };
+
   const setCustomWallpaperUrl = (url) => {
     setCustomWallpaperUrlState(url);
     localStorage.setItem('totools_custom_wallpaper_url', url);
@@ -109,6 +122,7 @@ export const WindowProvider = ({ children }) => {
         const visible = prev.filter((w) => !w.isMinimized);
         if (visible.length > 0) {
           const highestZ = visible.reduce((max, w) => (w.zIndex > max.zIndex ? w : max), visible[0]);
+          playSound('close', soundEnabled);
           return prev.filter((w) => w.instanceId !== highestZ.instanceId);
         }
         return prev;
@@ -117,7 +131,7 @@ export const WindowProvider = ({ children }) => {
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [soundEnabled]);
 
   // Listen for Escape key & Ctrl+Space for Spotlight
   useEffect(() => {
@@ -125,18 +139,24 @@ export const WindowProvider = ({ children }) => {
       // Toggle Spotlight with Ctrl+Space or Cmd+Space
       if ((e.ctrlKey || e.metaKey) && e.code === 'Space') {
         e.preventDefault();
-        setIsSpotlightOpen((prev) => !prev);
+        setIsSpotlightOpen((prev) => {
+          const next = !prev;
+          if (next) playSound('spotlight', soundEnabled);
+          return next;
+        });
         return;
       }
 
       if (e.key === 'Escape') {
         if (isSpotlightOpen) {
           setIsSpotlightOpen(false);
+          playSound('click', soundEnabled);
           return;
         }
 
         if (isStartOpen) {
           setIsStartOpen(false);
+          playSound('click', soundEnabled);
           return;
         }
 
@@ -144,6 +164,7 @@ export const WindowProvider = ({ children }) => {
           const visible = prev.filter((w) => !w.isMinimized);
           if (visible.length > 0) {
             const topWin = visible.reduce((max, w) => (w.zIndex > max.zIndex ? w : max), visible[0]);
+            playSound('close', soundEnabled);
             return prev.filter((w) => w.instanceId !== topWin.instanceId);
           }
           return prev;
@@ -153,7 +174,7 @@ export const WindowProvider = ({ children }) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isStartOpen, isSpotlightOpen]);
+  }, [isStartOpen, isSpotlightOpen, soundEnabled]);
 
   const openTool = (toolId) => {
     setIsStartOpen(false);
@@ -168,6 +189,7 @@ export const WindowProvider = ({ children }) => {
         );
       }
       focusWindow(existing.instanceId);
+      playSound('open', soundEnabled);
       return;
     }
 
@@ -198,11 +220,13 @@ export const WindowProvider = ({ children }) => {
     // Push history state so back button closes this window
     window.history.pushState({ instanceId: newWindow.instanceId }, '');
 
+    playSound('open', soundEnabled);
     setOpenWindows((prev) => [...prev, newWindow]);
     setActiveWindowId(newWindow.instanceId);
   };
 
   const closeWindow = (instanceId) => {
+    playSound('close', soundEnabled);
     setOpenWindows((prev) => prev.filter((w) => w.instanceId !== instanceId));
     if (activeWindowId === instanceId) {
       const remaining = openWindows.filter((w) => w.instanceId !== instanceId);
@@ -216,6 +240,7 @@ export const WindowProvider = ({ children }) => {
   };
 
   const minimizeWindow = (instanceId) => {
+    playSound('minimize', soundEnabled);
     setOpenWindows((prev) =>
       prev.map((w) =>
         w.instanceId === instanceId
@@ -235,6 +260,7 @@ export const WindowProvider = ({ children }) => {
   };
 
   const toggleMaximizeWindow = (instanceId) => {
+    playSound('click', soundEnabled);
     setOpenWindows((prev) =>
       prev.map((w) => (w.instanceId === instanceId ? { ...w, isMaximized: !w.isMaximized } : w))
     );
@@ -265,8 +291,15 @@ export const WindowProvider = ({ children }) => {
     );
   };
 
-  const toggleStartMenu = () => setIsStartOpen((prev) => !prev);
-  const toggleSpotlight = () => setIsSpotlightOpen((prev) => !prev);
+  const toggleStartMenu = () => {
+    playSound('click', soundEnabled);
+    setIsStartOpen((prev) => !prev);
+  };
+  
+  const toggleSpotlight = () => {
+    playSound('spotlight', soundEnabled);
+    setIsSpotlightOpen((prev) => !prev);
+  };
 
   return (
     <WindowContext.Provider
@@ -280,6 +313,8 @@ export const WindowProvider = ({ children }) => {
         setWallpaper: setWallpaperState,
         customWallpaperUrl,
         setCustomWallpaperUrl,
+        soundEnabled,
+        setSoundEnabled,
         isStartOpen,
         toggleStartMenu,
         isSpotlightOpen,
