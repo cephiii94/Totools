@@ -25,6 +25,8 @@ const TOOL_COMPONENTS = {
   settings: SettingsTool
 };
 
+import { UpdateToast } from '../notification/UpdateToast';
+
 export const Desktop = () => {
   const { toolsList, openWindows, openTool, toggleSpotlight, wallpaper, customWallpaperUrl } = useWindowContext();
   const [greeting, setGreeting] = useState('');
@@ -140,6 +142,9 @@ export const Desktop = () => {
 
       {/* PWA Installation Prompt Banner */}
       <PWAInstallPrompt />
+
+      {/* Version Update & Clear Cache Toast Notification */}
+      <UpdateToast />
     </div>
   );
 };

@@ -67,8 +67,13 @@ export const Dock = () => {
         } ${isHoverRevealed ? 'is-hover-revealed' : ''}`}
         onMouseEnter={() => setIsHoverRevealed(true)}
       >
-        <button className="dock-item" style={{ background: '#2563eb' }} onClick={toggleStartMenu} title="Start Menu">
-          <LayoutGrid size={22} />
+        <button className="dock-item win11-start-btn" style={{ background: '#0078d4' }} onClick={toggleStartMenu} title="Start Menu">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="1" width="8.2" height="8.2" rx="1.5" fill="#ffffff" />
+            <rect x="10.8" y="1" width="8.2" height="8.2" rx="1.5" fill="#ffffff" />
+            <rect x="1" y="10.8" width="8.2" height="8.2" rx="1.5" fill="#ffffff" />
+            <rect x="10.8" y="10.8" width="8.2" height="8.2" rx="1.5" fill="#ffffff" />
+          </svg>
         </button>
 
         <div className="dock-divider" />

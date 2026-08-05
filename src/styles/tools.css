@@ -682,6 +682,197 @@
   .stat-label {
     font-size: 10px;
   }
+}
+
+/* Windows 10/11 Settings Sidebar Layout */
+.win-settings-container {
+  display: flex;
+  height: 100%;
+  min-height: 420px;
+  background: transparent;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Left Sidebar */
+.win-settings-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.03);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+[data-theme="focus"] .win-settings-sidebar {
+  background: rgba(255, 255, 255, 0.03);
+  border-right-color: rgba(255, 255, 255, 0.08);
+}
+
+.win-settings-sidebar-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 6px 12px 10px 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.win-settings-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  position: relative;
+  width: 100%;
+}
+
+.win-settings-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.win-settings-nav-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="focus"] .win-settings-nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.win-settings-nav-item.is-active {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  font-weight: 700;
+}
+
+[data-theme="focus"] .win-settings-nav-item.is-active {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+.win-settings-nav-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3.5px;
+  background: #2563eb;
+  border-radius: 4px;
+}
+
+[data-theme="focus"] .win-settings-nav-item.is-active::before {
+  background: #38bdf8;
+}
+
+.win-settings-chevron-mobile {
+  display: none;
+  color: var(--text-muted);
+}
+
+/* Right Content Area */
+.win-settings-content {
+  flex: 1;
+  padding: 12px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile Back Header */
+.win-settings-mobile-back {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="focus"] .win-settings-mobile-back {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-mobile-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+[data-theme="focus"] .btn-mobile-back {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+/* Mobile / Narrow Window (< 720px) responsive rules */
+@media (max-width: 720px) {
+  .win-settings-container {
+    flex-direction: column;
+    min-height: 380px;
+  }
+
+  .win-settings-container.mobile-show-list .win-settings-sidebar {
+    display: flex;
+    width: 100%;
+    border-right: none;
+    padding: 8px 0;
+  }
+
+  .win-settings-container.mobile-show-list .win-settings-content {
+    display: none;
+  }
+
+  .win-settings-container.mobile-show-detail .win-settings-sidebar {
+    display: none;
+  }
+
+  .win-settings-container.mobile-show-detail .win-settings-content {
+    display: flex;
+    width: 100%;
+    padding: 8px 0;
+  }
+
+  .win-settings-mobile-back {
+    display: flex;
+  }
+
+  .win-settings-chevron-mobile {
+    display: block;
+  }
+
+  .win-settings-nav-item {
+    padding: 14px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+
+  [data-theme="focus"] .win-settings-nav-item {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
 
   .theme-options-grid {
     grid-template-columns: 1fr;
@@ -701,4 +892,125 @@
   .custom-url-input-group {
     flex-direction: column;
   }
+}
+
+/* Container-based Narrow Window Rule (when window container width < 720px) */
+.win-settings-container.is-narrow-window {
+  flex-direction: column;
+  min-height: 380px;
+}
+
+.win-settings-container.is-narrow-window.mobile-show-list .win-settings-sidebar {
+  display: flex;
+  width: 100%;
+  border-right: none;
+  padding: 8px 0;
+}
+
+.win-settings-container.is-narrow-window.mobile-show-list .win-settings-content {
+  display: none;
+}
+
+.win-settings-container.is-narrow-window.mobile-show-detail .win-settings-sidebar {
+  display: none;
+}
+
+.win-settings-container.is-narrow-window.mobile-show-detail .win-settings-content {
+  display: flex;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.win-settings-container.is-narrow-window .win-settings-mobile-back {
+  display: flex;
+}
+
+.win-settings-container.is-narrow-window .win-settings-chevron-mobile {
+  display: block;
+}
+
+.win-settings-container.is-narrow-window .win-settings-nav-item {
+  padding: 14px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+[data-theme="focus"] .win-settings-container.is-narrow-window .win-settings-nav-item {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Category Card Container & Header Dividers */
+.settings-section-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.settings-category-card {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+[data-theme="focus"] .settings-category-card {
+  background: rgba(30, 41, 59, 0.5);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="focus"] .category-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.category-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+[data-theme="focus"] .category-icon-badge {
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  box-shadow: 0 4px 10px rgba(56, 189, 248, 0.25);
+}
+
+.category-title-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.category-subtitle-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 2px 0 0 0;
 }
