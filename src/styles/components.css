@@ -1208,12 +1208,22 @@
   top: 76px;
   right: 28px;
   z-index: 10001;
-  animation: slideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: slideDown 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.pwa-install-banner.is-hiding {
+  animation: slideUpFade 0.3s forwards ease-in;
 }
 
 @keyframes slideDown {
   from { transform: translateY(-20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideUpFade {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-20px); opacity: 0; }
 }
 
 .pwa-banner-content {

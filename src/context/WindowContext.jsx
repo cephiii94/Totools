@@ -283,10 +283,16 @@ export const WindowProvider = ({ children }) => {
     const newZIndex = topZIndex + 1;
     setTopZIndex(newZIndex);
 
-    // Initial staggered position
-    const offset = (openWindows.length % 5) * 30;
-    const initialX = Math.max(20, Math.min(window.innerWidth - toolConfig.defaultSize.width - 20, 100 + offset));
-    const initialY = Math.max(20, Math.min(window.innerHeight - toolConfig.defaultSize.height - 80, 60 + offset));
+    // Initial centered position on screen with slight staggered offset
+    const winWidth = toolConfig.defaultSize.width;
+    const winHeight = toolConfig.defaultSize.height;
+    const staggerOffset = (openWindows.length % 5) * 20;
+
+    const centerX = Math.round((window.innerWidth - winWidth) / 2) + staggerOffset;
+    const centerY = Math.round((window.innerHeight - winHeight) / 2) + staggerOffset;
+
+    const initialX = Math.max(10, Math.min(window.innerWidth - winWidth - 10, centerX));
+    const initialY = Math.max(10, Math.min(window.innerHeight - winHeight - 70, centerY));
 
     const newWindow = {
       id: toolConfig.id,
