@@ -31,6 +31,7 @@ export const SettingsTool = () => {
     wallpaper, setWallpaper,
     customWallpaperUrl, setCustomWallpaperUrl,
     soundEnabled, setSoundEnabled,
+    soundConfig, toggleSoundEffect,
     showAlert, showConfirm
   } = useWindowContext();
 
@@ -445,7 +446,7 @@ export const SettingsTool = () => {
                   </div>
                 </div>
 
-                {/* Sound Effects Test Console */}
+                {/* Kategori 2: Pengaturan Suara per Aksi */}
                 <div className="settings-category-card">
                   <div className="category-header">
                     <div className="category-title-group">
@@ -453,33 +454,137 @@ export const SettingsTool = () => {
                         <Play size={16} />
                       </div>
                       <div>
-                        <h3 className="category-title-text">Konsol Uji Efek Suara</h3>
-                        <p className="category-subtitle-text">Uji performa efek suara sintetis secara langsung</p>
+                        <h3 className="category-title-text">Pengaturan Suara per Aksi</h3>
+                        <p className="category-subtitle-text">Aktifkan / matikan efek suara tertentu & uji bunyinya</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="sound-test-grid">
-                    <button className="sound-test-btn" onClick={() => playSound('click', true)}>
-                      <MousePointer size={14} />
-                      <span>Suara Klik</span>
-                    </button>
-                    <button className="sound-test-btn" onClick={() => playSound('open', true)}>
-                      <Maximize2 size={14} />
-                      <span>Suara Buka Window</span>
-                    </button>
-                    <button className="sound-test-btn" onClick={() => playSound('minimize', true)}>
-                      <Minimize2 size={14} />
-                      <span>Suara Minimize</span>
-                    </button>
-                    <button className="sound-test-btn" onClick={() => playSound('close', true)}>
-                      <Trash2 size={14} />
-                      <span>Suara Tutup Window</span>
-                    </button>
-                    <button className="sound-test-btn" onClick={() => playSound('spotlight', true)} style={{ gridColumn: 'span 2' }}>
-                      <Search size={14} />
-                      <span>Suara Spotlight Search (Ctrl + Space)</span>
-                    </button>
+                  <div className="sound-effects-stack">
+                    {/* 1. Suara Klik */}
+                    <div className="sound-effect-item">
+                      <div className="sound-effect-left">
+                        <div className="sound-effect-icon">
+                          <MousePointer size={15} />
+                        </div>
+                        <div className="sound-effect-meta">
+                          <span className="sound-effect-name">Suara Klik Tombol</span>
+                          <span className="sound-effect-desc">Nada klik saat menekan tombol & menu</span>
+                        </div>
+                      </div>
+                      <div className="sound-effect-actions">
+                        <button className="sound-test-mini-btn" onClick={() => playSound('click', true)} title="Uji Suara Klik">
+                          <Play size={12} /> Test
+                        </button>
+                        <button
+                          className={`toggle-switch ${soundConfig?.click !== false ? 'is-on' : ''}`}
+                          onClick={() => toggleSoundEffect('click')}
+                          title={soundConfig?.click !== false ? 'Matikan Suara Klik' : 'Aktifkan Suara Klik'}
+                        >
+                          <div className="toggle-handle" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 2. Suara Buka Window */}
+                    <div className="sound-effect-item">
+                      <div className="sound-effect-left">
+                        <div className="sound-effect-icon">
+                          <Maximize2 size={15} />
+                        </div>
+                        <div className="sound-effect-meta">
+                          <span className="sound-effect-name">Suara Buka Window</span>
+                          <span className="sound-effect-desc">Nada lonceng kaca halus saat membuka jendela</span>
+                        </div>
+                      </div>
+                      <div className="sound-effect-actions">
+                        <button className="sound-test-mini-btn" onClick={() => playSound('open', true)} title="Uji Suara Buka">
+                          <Play size={12} /> Test
+                        </button>
+                        <button
+                          className={`toggle-switch ${soundConfig?.open !== false ? 'is-on' : ''}`}
+                          onClick={() => toggleSoundEffect('open')}
+                          title={soundConfig?.open !== false ? 'Matikan Suara Buka' : 'Aktifkan Suara Buka'}
+                        >
+                          <div className="toggle-handle" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 3. Suara Minimize */}
+                    <div className="sound-effect-item">
+                      <div className="sound-effect-left">
+                        <div className="sound-effect-icon">
+                          <Minimize2 size={15} />
+                        </div>
+                        <div className="sound-effect-meta">
+                          <span className="sound-effect-name">Suara Minimize</span>
+                          <span className="sound-effect-desc">Nada meluncur saat meminimalkan jendela</span>
+                        </div>
+                      </div>
+                      <div className="sound-effect-actions">
+                        <button className="sound-test-mini-btn" onClick={() => playSound('minimize', true)} title="Uji Suara Minimize">
+                          <Play size={12} /> Test
+                        </button>
+                        <button
+                          className={`toggle-switch ${soundConfig?.minimize !== false ? 'is-on' : ''}`}
+                          onClick={() => toggleSoundEffect('minimize')}
+                          title={soundConfig?.minimize !== false ? 'Matikan Suara Minimize' : 'Aktifkan Suara Minimize'}
+                        >
+                          <div className="toggle-handle" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 4. Suara Tutup Window */}
+                    <div className="sound-effect-item">
+                      <div className="sound-effect-left">
+                        <div className="sound-effect-icon">
+                          <Trash2 size={15} />
+                        </div>
+                        <div className="sound-effect-meta">
+                          <span className="sound-effect-name">Suara Tutup Window</span>
+                          <span className="sound-effect-desc">Nada menurun halus saat menutup jendela</span>
+                        </div>
+                      </div>
+                      <div className="sound-effect-actions">
+                        <button className="sound-test-mini-btn" onClick={() => playSound('close', true)} title="Uji Suara Tutup">
+                          <Play size={12} /> Test
+                        </button>
+                        <button
+                          className={`toggle-switch ${soundConfig?.close !== false ? 'is-on' : ''}`}
+                          onClick={() => toggleSoundEffect('close')}
+                          title={soundConfig?.close !== false ? 'Matikan Suara Tutup' : 'Aktifkan Suara Tutup'}
+                        >
+                          <div className="toggle-handle" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 5. Suara Spotlight Search */}
+                    <div className="sound-effect-item">
+                      <div className="sound-effect-left">
+                        <div className="sound-effect-icon">
+                          <Search size={15} />
+                        </div>
+                        <div className="sound-effect-meta">
+                          <span className="sound-effect-name">Suara Spotlight Search</span>
+                          <span className="sound-effect-desc">Nada dentang tinggi saat Ctrl + Space</span>
+                        </div>
+                      </div>
+                      <div className="sound-effect-actions">
+                        <button className="sound-test-mini-btn" onClick={() => playSound('spotlight', true)} title="Uji Suara Spotlight">
+                          <Play size={12} /> Test
+                        </button>
+                        <button
+                          className={`toggle-switch ${soundConfig?.spotlight !== false ? 'is-on' : ''}`}
+                          onClick={() => toggleSoundEffect('spotlight')}
+                          title={soundConfig?.spotlight !== false ? 'Matikan Suara Spotlight' : 'Aktifkan Suara Spotlight'}
+                        >
+                          <div className="toggle-handle" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

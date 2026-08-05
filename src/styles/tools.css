@@ -1014,3 +1014,115 @@
   color: var(--text-muted);
   margin: 2px 0 0 0;
 }
+
+/* Individual Sound Effects Control Items */
+.sound-effects-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sound-effect-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  transition: all 0.15s ease;
+}
+
+[data-theme="focus"] .sound-effect-item {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sound-effect-item:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+[data-theme="focus"] .sound-effect-item:hover {
+  background: rgba(40, 53, 75, 0.8);
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+.sound-effect-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.sound-effect-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+[data-theme="focus"] .sound-effect-icon {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+.sound-effect-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.sound-effect-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.sound-effect-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.sound-effect-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sound-test-mini-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+[data-theme="focus"] .sound-test-mini-btn {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.25);
+  color: #38bdf8;
+}
+
+.sound-test-mini-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+[data-theme="focus"] .sound-test-mini-btn:hover {
+  background: #38bdf8;
+  color: #0f172a;
+}

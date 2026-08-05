@@ -1,4 +1,4 @@
-// Web Audio API Synthesizer for macOS OS Sound Effects
+// Web Audio API Synthesizer for macOS / Windows OS Sound Effects
 let audioCtx = null;
 
 const getAudioContext = () => {
@@ -14,8 +14,9 @@ const getAudioContext = () => {
   return audioCtx;
 };
 
-export const playSound = (type, isEnabled = true) => {
+export const playSound = (type = 'click', isEnabled = true, soundConfig = null) => {
   if (!isEnabled) return;
+  if (soundConfig && soundConfig[type] === false) return;
 
   try {
     const ctx = getAudioContext();
