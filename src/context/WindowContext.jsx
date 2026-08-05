@@ -92,6 +92,59 @@ export const WindowProvider = ({ children }) => {
   const [isStartOpen, setIsStartOpen] = useState(false);
   const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
 
+  // Custom Windows 11 Modal Dialog State
+  const [dialogState, setDialogState] = useState({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: '',
+    confirmText: 'Ya, Lanjutkan',
+    cancelText: 'Batal',
+    onConfirm: null,
+    onCancel: null
+  });
+
+  const showAlert = ({ title, message, type = 'info', onConfirm = null }) => {
+    playSound('open', soundEnabled);
+    setDialogState({
+      isOpen: true,
+      type,
+      title,
+      message,
+      confirmText: 'Mengerti',
+      cancelText: null,
+      onConfirm,
+      onCancel: null
+    });
+  };
+
+  const showConfirm = ({
+    title,
+    message,
+    confirmText = 'Ya, Lanjutkan',
+    cancelText = 'Batal',
+    type = 'warning',
+    onConfirm,
+    onCancel = null
+  }) => {
+    playSound('open', soundEnabled);
+    setDialogState({
+      isOpen: true,
+      type,
+      title,
+      message,
+      confirmText,
+      cancelText,
+      onConfirm,
+      onCancel
+    });
+  };
+
+  const closeDialog = () => {
+    playSound('click', soundEnabled);
+    setDialogState((prev) => ({ ...prev, isOpen: false }));
+  };
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('totools_theme', theme);
@@ -326,7 +379,11 @@ export const WindowProvider = ({ children }) => {
         toggleMaximizeWindow,
         focusWindow,
         updateWindowPosition,
-        updateWindowSize
+        updateWindowSize,
+        dialogState,
+        showAlert,
+        showConfirm,
+        closeDialog
       }}
     >
       {children}

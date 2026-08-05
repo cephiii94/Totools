@@ -30,7 +30,8 @@ export const SettingsTool = () => {
     theme, setTheme,
     wallpaper, setWallpaper,
     customWallpaperUrl, setCustomWallpaperUrl,
-    soundEnabled, setSoundEnabled
+    soundEnabled, setSoundEnabled,
+    showAlert, showConfirm
   } = useWindowContext();
 
   const [activeTab, setActiveTab] = useState('visual'); // 'visual' | 'sound' | 'system'
@@ -74,7 +75,11 @@ export const SettingsTool = () => {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      alert('Silakan pilih file gambar yang valid (JPG, PNG, WEBP).');
+      showAlert({
+        type: 'warning',
+        title: 'Berkas Tidak Valid',
+        message: 'Silakan pilih berkas gambar yang valid (JPG, PNG, atau WEBP).'
+      });
       return;
     }
 
@@ -139,21 +144,39 @@ export const SettingsTool = () => {
   };
 
   const handleResetAllPreferences = () => {
-    if (window.confirm('Apakah Anda yakin ingin mengembalikan semua preferensi tema & wallpaper ke bawaan pabrik?')) {
-      setTheme('default');
-      setWallpaper('glass-blue');
-      setCustomWallpaperUrl('');
-      setInputUrl('');
-      setSoundEnabled(true);
-      setUploadStatus('');
-      alert('Preferensi OS berhasil dikembalikan ke bawaan pabrik.');
-    }
+    showConfirm({
+      type: 'danger',
+      title: 'Reset Preferensi OS',
+      message: 'Apakah Anda yakin ingin mengembalikan semua preferensi tema, wallpaper, dan suara ke versi bawaan pabrik?',
+      confirmText: 'Ya, Reset OS',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        setTheme('default');
+        setWallpaper('glass-blue');
+        setCustomWallpaperUrl('');
+        setInputUrl('');
+        setSoundEnabled(true);
+        setUploadStatus('');
+        showAlert({
+          type: 'success',
+          title: 'Reset Berhasil',
+          message: 'Seluruh preferensi OS berhasil dikembalikan ke standar bawaan pabrik.'
+        });
+      }
+    });
   };
 
   const handleClearCache = () => {
-    if (window.confirm('Hapus seluruh cache browser & Service Worker untuk memuat pembaruan aplikasi terbaru?')) {
-      clearAppCache();
-    }
+    showConfirm({
+      type: 'warning',
+      title: 'Hapus Cache & Refresh OS',
+      message: 'Bersihkan seluruh cache browser & Service Worker PWA untuk memuat pembaruan aplikasi terbaru?',
+      confirmText: 'Ya, Hapus Cache',
+      cancelText: 'Batal',
+      onConfirm: () => {
+        clearAppCache();
+      }
+    });
   };
 
   const handleSelectTab = (tabKey) => {

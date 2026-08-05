@@ -1620,3 +1620,190 @@
   background: rgba(0, 0, 0, 0.08);
   color: #0f172a;
 }
+
+/* Windows 11 Fluent Modal Dialog Popups */
+@keyframes win11DialogPop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.win11-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.win11-dialog-card {
+  width: min(440px, calc(100vw - 32px));
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(35px) saturate(180%);
+  -webkit-backdrop-filter: blur(35px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.5);
+  animation: win11DialogPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+[data-theme="focus"] .win11-dialog-card {
+  background: rgba(20, 24, 33, 0.94);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.win11-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.win11-dialog-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.badge-type-info {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.badge-type-success {
+  background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.badge-type-warning {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+.badge-type-danger {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.win11-dialog-close {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.win11-dialog-close:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+}
+
+[data-theme="focus"] .win11-dialog-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.win11-dialog-body {
+  margin-bottom: 20px;
+}
+
+.win11-dialog-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.win11-dialog-message {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.win11-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-dialog-cancel {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+[data-theme="focus"] .btn-dialog-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.btn-dialog-cancel:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="focus"] .btn-dialog-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-dialog-confirm {
+  border: none;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s ease;
+}
+
+.btn-confirm-info {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.btn-confirm-success {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.btn-confirm-warning {
+  background: linear-gradient(135deg, #d97706, #b45309);
+}
+
+.btn-confirm-danger {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+.btn-dialog-confirm:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}

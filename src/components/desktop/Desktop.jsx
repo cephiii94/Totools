@@ -25,6 +25,7 @@ const TOOL_COMPONENTS = {
   settings: SettingsTool
 };
 
+import { CustomDialog } from '../modal/CustomDialog';
 import { UpdateToast } from '../notification/UpdateToast';
 
 export const Desktop = () => {
@@ -145,6 +146,9 @@ export const Desktop = () => {
 
       {/* Version Update & Clear Cache Toast Notification */}
       <UpdateToast />
+
+      {/* Windows 11 Custom Modal Dialog */}
+      <CustomDialog />
     </div>
   );
 };
