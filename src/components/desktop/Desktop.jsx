@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useWindowContext } from '../../context/WindowContext';
+import { useAuth } from '../../context/AuthContext';
 import { DesktopShortcut } from './DesktopShortcut';
 import { Window } from '../window/Window';
 import { Dock } from '../dock/Dock';
 import { Spotlight } from './Spotlight';
 import { PWAInstallPrompt } from '../pwa/PWAInstallPrompt';
-import { Search } from 'lucide-react';
+import { Search, User } from 'lucide-react';
 
 import { CurrencyTool } from '../../tools/CurrencyTool';
 import { TranslatorTool } from '../../tools/TranslatorTool';
@@ -26,10 +27,12 @@ const TOOL_COMPONENTS = {
 };
 
 import { CustomDialog } from '../modal/CustomDialog';
+import { AuthModal } from '../modal/AuthModal';
 import { UpdateToast } from '../notification/UpdateToast';
 
 export const Desktop = () => {
   const { toolsList, openWindows, openTool, toggleSpotlight, wallpaper, customWallpaperUrl } = useWindowContext();
+  const { user, openAuthModal } = useAuth();
   const [greeting, setGreeting] = useState('');
   const [formattedDate, setFormattedDate] = useState('');
 
@@ -118,6 +121,7 @@ export const Desktop = () => {
         </div>
       </div>
 
+
       {/* Desktop Shortcuts */}
       <div className="desktop-grid">
         {toolsList.map((tool) => (
@@ -149,6 +153,10 @@ export const Desktop = () => {
 
       {/* Windows 11 Custom Modal Dialog */}
       <CustomDialog />
+
+      {/* Supabase Auth Modal */}
+      <AuthModal />
     </div>
   );
 };
+

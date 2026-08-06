@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWindowContext } from '../../context/WindowContext';
+import { useAuth } from '../../context/AuthContext';
 import {
   Search,
   ChevronRight,
@@ -9,15 +10,19 @@ import {
   RotateCcw,
   Lock,
   Sparkles,
-  X
+  X,
+  LogIn,
+  LogOut
 } from 'lucide-react';
 
 import { clearAppCache } from '../../utils/cache';
 
 export const StartMenu = () => {
   const { toolsList, openTool, isStartOpen, toggleStartMenu } = useWindowContext();
+  const { user, openAuthModal, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('pinned'); // 'pinned' | 'all'
+
   const [showPowerMenu, setShowPowerMenu] = useState(false);
   const menuRef = useRef(null);
   const powerRef = useRef(null);
@@ -219,19 +224,67 @@ export const StartMenu = () => {
 
       {/* Footer Profile & Power */}
       <div className="win11-start-footer">
-        <div className="win11-user-profile" title="Akun Pengguna Totools">
-          <div className="win11-avatar">
-            <span>TP</span>
+        <div
+          className="win11-user-profile"
+          onClick={() => {
+            if (!user) {
+              toggleStartMenu();
+              openAuthModal();
+            }
+          }}
+          title={user ? `Login sebagai ${user.email}` : 'Klik untuk Masuk / Daftar Akun'}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className="win11-avatar" style={{ overflow: 'hidden' }}>
+            {user?.user_metadata?.avatar_url ? (
+              <img
+                src={user.user_metadata.avatar_url}
+                alt="Avatar"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span>{user ? (user.user_metadata?.full_name || user.email || 'U').charAt(0).toUpperCase() : 'Guest'}</span>
+            )}
           </div>
           <div className="win11-user-info">
-            <span className="win11-user-name">Pengguna Totools</span>
-            <span className="win11-user-status">Aktif</span>
+            <span className="win11-user-name">
+              {user ? (user.user_metadata?.full_name || user.email?.split('@')[0]) : 'Tamu / Guest'}
+            </span>
+            <span className="win11-user-status" style={{ color: user ? '#16a34a' : '#64748b' }}>
+              {user ? '🟢 Terhubung Supabase' : '⚪ Mode Lokal'}
+            </span>
           </div>
         </div>
 
         <div className="win11-power-wrapper" ref={powerRef}>
           {showPowerMenu && (
             <div className="win11-power-popup">
+              {user ? (
+                <button
+                  className="win11-power-option"
+                  onClick={() => {
+                    setShowPowerMenu(false);
+                    signOut();
+                  }}
+                  style={{ color: '#dc2626' }}
+                >
+                  <LogOut size={15} />
+                  <span>Keluar Akun (Sign Out)</span>
+                </button>
+              ) : (
+                <button
+                  className="win11-power-option"
+                  onClick={() => {
+                    setShowPowerMenu(false);
+                    toggleStartMenu();
+                    openAuthModal();
+                  }}
+                  style={{ color: '#2563eb' }}
+                >
+                  <LogIn size={15} />
+                  <span>Masuk / Daftar Akun</span>
+                </button>
+              )}
               <button className="win11-power-option" onClick={() => handlePowerAction('restart')}>
                 <RotateCcw size={15} />
                 <span>Mulai Ulang & Hapus Cache</span>
@@ -250,7 +303,7 @@ export const StartMenu = () => {
           <button
             className={`win11-power-btn ${showPowerMenu ? 'active' : ''}`}
             onClick={() => setShowPowerMenu((prev) => !prev)}
-            title="Daya"
+            title="Daya & Akun"
           >
             <Power size={17} />
           </button>
@@ -259,3 +312,4 @@ export const StartMenu = () => {
     </div>
   );
 };
+

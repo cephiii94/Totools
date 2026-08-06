@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "gk": "^0.0.1",
+    "@supabase/supabase-js": "^2.112.1",
     "jsbarcode": "^3.11.6",
     "jszip": "^3.10.1",
     "kok": "^0.0.0",

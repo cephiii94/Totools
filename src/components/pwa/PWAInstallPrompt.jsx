@@ -22,13 +22,24 @@ export const PWAInstallPrompt = () => {
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
+      window.deferredPWAInstallPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-prompt-changed', { detail: e }));
       setIsVisible(true);
     };
 
+    const handleAppInstalled = () => {
+      setIsVisible(false);
+      setDeferredPrompt(null);
+      window.deferredPWAInstallPrompt = null;
+      window.dispatchEvent(new CustomEvent('pwa-prompt-changed', { detail: null }));
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
 
@@ -53,13 +64,16 @@ export const PWAInstallPrompt = () => {
   };
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
+    const promptEvent = deferredPrompt || window.deferredPWAInstallPrompt;
+    if (!promptEvent) return;
+    promptEvent.prompt();
+    const { outcome } = await promptEvent.userChoice;
     if (outcome === 'accepted') {
       dismissPrompt();
     }
     setDeferredPrompt(null);
+    window.deferredPWAInstallPrompt = null;
+    window.dispatchEvent(new CustomEvent('pwa-prompt-changed', { detail: null }));
   };
 
   if (!isVisible) return null;
@@ -82,5 +96,7 @@ export const PWAInstallPrompt = () => {
         </button>
       </div>
     </div>
+  );
+};
   );
 };

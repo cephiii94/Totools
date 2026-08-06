@@ -18,7 +18,8 @@ import {
   Maximize2,
   Minimize2,
   Search,
-  MousePointer
+  MousePointer,
+  Download
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
 import { AdBanner } from '../components/ads/AdBanner';
@@ -40,6 +41,48 @@ export const SettingsTool = () => {
   const [inputUrl, setInputUrl] = useState(customWallpaperUrl && !customWallpaperUrl.startsWith('data:') ? customWallpaperUrl : '');
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
+  
+  // PWA State
+  const [canInstallPWA, setCanInstallPWA] = useState(Boolean(window.deferredPWAInstallPrompt));
+  const [isPWAInstalled, setIsPWAInstalled] = useState(
+    window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true
+  );
+
+  useEffect(() => {
+    const handlePWAChange = () => {
+      setCanInstallPWA(Boolean(window.deferredPWAInstallPrompt));
+      setIsPWAInstalled(
+        window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true
+      );
+    };
+
+    window.addEventListener('pwa-prompt-changed', handlePWAChange);
+    window.addEventListener('appinstalled', handlePWAChange);
+    return () => {
+      window.removeEventListener('pwa-prompt-changed', handlePWAChange);
+      window.removeEventListener('appinstalled', handlePWAChange);
+    };
+  }, []);
+
+  const handleTriggerPWAInstall = async () => {
+    if (!window.deferredPWAInstallPrompt) {
+      showAlert({
+        type: 'info',
+        title: 'Instalasi Aplikasi PWA',
+        message: 'Aplikasi ini mendukung PWA. Anda juga dapat memasangnya secara manual melalui menu browser Anda (Pilih "Tambahkan ke Layar Utama" / "Install App").'
+      });
+      return;
+    }
+    const promptEvent = window.deferredPWAInstallPrompt;
+    promptEvent.prompt();
+    const { outcome } = await promptEvent.userChoice;
+    if (outcome === 'accepted') {
+      setIsPWAInstalled(true);
+    }
+    window.deferredPWAInstallPrompt = null;
+    setCanInstallPWA(false);
+  };
+
   
   // Mobile drill-down view state
   const [isMobileDetailOpen, setIsMobileDetailOpen] = useState(false);
@@ -620,6 +663,36 @@ export const SettingsTool = () => {
                     <span className="pill-badge">Spotlight Search</span>
                     <span className="pill-badge">React 18 + Vite 6</span>
                   </div>
+                </div>
+
+                {/* Kategori PWA Install */}
+                <div className="settings-category-card">
+                  <div className="category-header">
+                    <div className="category-title-group">
+                      <div className="category-icon-badge" style={{ background: 'linear-gradient(135deg, #0284c7, #2563eb)' }}>
+                        <Download size={16} />
+                      </div>
+                      <div>
+                        <h3 className="category-title-text">Aplikasi Desktop & HP Native (PWA)</h3>
+                        <p className="category-subtitle-text">Pasang Totools sebagai aplikasi mandiri yang bekerja 100% offline</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+                    Jalankan Totools layaknya aplikasi desktop (Windows/Mac) atau HP (Android/iOS) native tanpa bar navigasi browser.
+                  </p>
+
+                  {isPWAInstalled ? (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: 'rgba(22, 163, 74, 0.1)', border: '1px solid rgba(22, 163, 74, 0.25)', borderRadius: 8, color: '#16a34a', fontSize: 12, fontWeight: 700 }}>
+                      <Check size={16} />
+                      <span>Totools OS Sudah Terpasang (Mode Standalone Native)</span>
+                    </div>
+                  ) : (
+                    <button className="btn-primary" onClick={handleTriggerPWAInstall} style={{ padding: '8px 14px' }}>
+                      <Download size={14} /> {canInstallPWA ? 'Install Totools OS Sekarang' : 'Petunjuk Pasang Aplikasi PWA'}
+                    </button>
+                  )}
                 </div>
 
                 <div className="settings-category-card">
